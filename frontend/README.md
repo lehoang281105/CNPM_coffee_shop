@@ -213,23 +213,159 @@ Hệ thống hỗ trợ 3 vai trò:
 - File names sử dụng camelCase hoặc PascalCase
 - Sử dụng functional components và hooks
 
-## 🤝 Đóng góp
+## 🌿 Hướng dẫn tạo nhánh khi code
 
-1. Fork repository
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
+### Quy tắc đặt tên nhánh
 
-## 👨‍💻 Thành viên nhóm
+Sử dụng format: `<type>/<description>`
 
-- **Lương Toàn Thắng** – Project Manager
-- **Bùi Duy Tuấn Anh** – Backend, AI
-- **Lê Huy Hoàng** – Backend
-- **Thiều Minh Duy** – Frontend
-- **Nguyễn Văn Đông** – Frontend
-- **Nguyễn Hoàng Nam** – Business Analyst
-- **Phạm Minh Hiếu** – Tester
+**Các loại nhánh:**
+- `feature/` - Tính năng mới
+- `bugfix/` - Sửa lỗi
+- `hotfix/` - Sửa lỗi khẩn cấp trên production
+- `refactor/` - Tái cấu trúc code
+- `docs/` - Cập nhật tài liệu
+- `test/` - Thêm hoặc sửa test
 
+**Ví dụ:**
+```
+feature/login-page
+feature/admin-dashboard
+bugfix/fix-cart-calculation
+hotfix/fix-payment-error
+refactor/optimize-api-calls
+docs/update-readme
+```
+
+### Quy trình làm việc với Git
+
+#### 1. Cập nhật code mới nhất từ main
+```bash
+# Chuyển về nhánh main
+git checkout main
+
+# Lấy code mới nhất
+git pull origin main
+```
+
+#### 2. Tạo nhánh mới cho task của bạn
+```bash
+# Tạo và chuyển sang nhánh mới
+git checkout -b feature/ten-tinh-nang
+
+# Hoặc tách làm 2 lệnh
+git branch feature/ten-tinh-nang
+git checkout feature/ten-tinh-nang
+```
+
+#### 3. Làm việc và commit code
+```bash
+# Xem trạng thái file thay đổi
+git status
+
+# Thêm file vào staging
+git add .                    # Thêm tất cả file
+git add src/components/      # Thêm một thư mục cụ thể
+git add src/App.tsx          # Thêm một file cụ thể
+
+# Commit với message rõ ràng
+git commit -m "feat: add login page with validation"
+git commit -m "fix: resolve cart total calculation bug"
+git commit -m "refactor: optimize API service structure"
+```
+
+**Quy ước commit message:**
+- `feat:` - Thêm tính năng mới
+- `fix:` - Sửa lỗi
+- `refactor:` - Tái cấu trúc code
+- `style:` - Thay đổi style, format code
+- `docs:` - Cập nhật tài liệu
+- `test:` - Thêm hoặc sửa test
+- `chore:` - Các công việc khác (update dependencies, config...)
+
+#### 4. Push code lên remote repository
+```bash
+# Lần đầu push nhánh mới
+git push -u origin feature/ten-tinh-nang
+
+# Các lần push tiếp theo
+git push
+```
+
+#### 5. Đồng bộ với nhánh main (nếu main có update)
+```bash
+# Cách 1: Merge main vào nhánh hiện tại
+git checkout feature/ten-tinh-nang
+git merge main
+
+# Cách 2: Rebase (khuyến nghị - giữ history sạch hơn)
+git checkout feature/ten-tinh-nang
+git rebase main
+
+# Nếu có conflict, giải quyết conflict rồi:
+git add .
+git rebase --continue
+# Hoặc hủy rebase
+git rebase --abort
+```
+
+#### 6. Tạo Pull Request
+1. Push code lên remote repository
+2. Vào GitHub/GitLab
+3. Tạo Pull Request từ nhánh của bạn vào `main`
+4. Đợi review từ team
+5. Sau khi được approve, merge vào main
+
+#### 7. Xóa nhánh sau khi merge (optional)
+```bash
+# Xóa nhánh local
+git branch -d feature/ten-tinh-nang
+
+# Xóa nhánh remote
+git push origin --delete feature/ten-tinh-nang
+```
+
+### Một số lệnh Git hữu ích
+
+```bash
+# Xem danh sách nhánh
+git branch              # Nhánh local
+git branch -r           # Nhánh remote
+git branch -a           # Tất cả nhánh
+
+# Chuyển nhánh
+git checkout ten-nhanh
+git switch ten-nhanh    # Cách mới hơn
+
+# Xem lịch sử commit
+git log
+git log --oneline       # Xem gọn hơn
+git log --graph         # Xem dạng graph
+
+# Hủy thay đổi
+git checkout -- file.txt        # Hủy thay đổi một file
+git reset HEAD file.txt         # Bỏ file khỏi staging
+git reset --hard HEAD           # Hủy tất cả thay đổi (cẩn thận!)
+
+# Stash - Tạm cất code chưa commit
+git stash               # Cất code
+git stash list          # Xem danh sách
+git stash pop           # Lấy code ra và xóa stash
+git stash apply         # Lấy code ra nhưng giữ stash
+
+# Xem sự khác biệt
+git diff                # So sánh working directory với staging
+git diff --staged       # So sánh staging với last commit
+```
+
+### ⚠️ Lưu ý quan trọng
+
+1. **KHÔNG bao giờ** commit trực tiếp vào nhánh `main`
+2. **Luôn luôn** tạo nhánh mới cho mỗi task/feature
+3. **Pull code mới** từ main trước khi bắt đầu làm việc
+4. **Commit thường xuyên** với message rõ ràng
+5. **Test kỹ** trước khi tạo Pull Request
+6. **Không commit** file như `.env`, `node_modules/`, `dist/`
+7. **Giải quyết conflict** cẩn thận, kiểm tra kỹ trước khi merge
 
 
