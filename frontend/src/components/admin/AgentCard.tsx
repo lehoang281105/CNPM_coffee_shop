@@ -1,4 +1,4 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Bot, Brand } from '../../types';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -44,10 +44,15 @@ interface AgentCardProps {
 }
 
 const AgentCard: React.FC<AgentCardProps> = ({ bot, brand }) => {
+  const navigate = useNavigate();
   const isActive = bot.status === 'active';
 
   return (
-    <article className="agent-card" id={`agent-card-${bot.id}`}>
+    <article 
+      className="agent-card" 
+      id={`agent-card-${bot.id}`}
+      onClick={() => navigate(`/agents/${bot.id}`)}
+    >
       {/* Header row */}
       <div className="agent-card__header">
         <div
