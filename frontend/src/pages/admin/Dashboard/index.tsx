@@ -10,15 +10,15 @@ import type { Bot, Brand } from '../../../types';
 
 // ── Stat Card ────────────────────────────────────────────────────────────────
 interface StatCardProps {
-  emoji: string;
+  iconClass: string;
   label: string;
   value: number | null;
   colorMod: 'blue' | 'green' | 'orange' | 'purple';
 }
 
-const StatCard: React.FC<StatCardProps> = ({ emoji, label, value, colorMod }) => (
+const StatCard: React.FC<StatCardProps> = ({ iconClass, label, value, colorMod }) => (
   <div className="stat-card">
-    <div className={`stat-icon stat-icon--${colorMod}`}>{emoji}</div>
+    <div className={`stat-icon stat-icon--${colorMod}`}><i className={iconClass}></i></div>
     <div className="stat-info">
       <span className="stat-label">{label}</span>
       {value === null
@@ -106,16 +106,16 @@ const DashboardPage: React.FC = () => {
 
         {/* Stats */}
         <div className="stats-grid">
-          <StatCard emoji="🤖" label="Tổng Agent"        value={totalBots}   colorMod="blue"   />
-          <StatCard emoji="✅" label="Đang hoạt động"    value={activeBots}  colorMod="green"  />
-          <StatCard emoji="🏠" label="Thương hiệu"       value={totalBrands} colorMod="orange" />
-          <StatCard emoji="🌐" label="Ngôn ngữ hỗ trợ"  value={totalLangs}  colorMod="purple" />
+          <StatCard iconClass="ti-android" label="Tổng Agent"        value={totalBots}   colorMod="blue"   />
+          <StatCard iconClass="ti-check-box" label="Đang hoạt động"    value={activeBots}  colorMod="green"  />
+          <StatCard iconClass="ti-home" label="Thương hiệu"       value={totalBrands} colorMod="orange" />
+          <StatCard iconClass="ti-world" label="Ngôn ngữ hỗ trợ"  value={totalLangs}  colorMod="purple" />
         </div>
 
         {/* Toolbar */}
         <div className="toolbar">
           <div className="search-wrap">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><i className="ti-search"></i></span>
             <input
               id="search-agents"
               className="search-input"
@@ -131,7 +131,7 @@ const DashboardPage: React.FC = () => {
             onClick={fetchData}
             title="Làm mới dữ liệu"
           >
-            🔄 Làm mới
+            <i className="ti-reload"></i> Làm mới
           </button>
         </div>
 
@@ -140,7 +140,7 @@ const DashboardPage: React.FC = () => {
           {/* Error */}
           {error && (
             <div className="error-banner">
-              ⚠️ {error}
+              <i className="ti-alert"></i> {error}
               <button onClick={fetchData}>Thử lại</button>
             </div>
           )}
@@ -155,7 +155,7 @@ const DashboardPage: React.FC = () => {
           {/* Empty state */}
           {!loading && !error && filteredBots.length === 0 && (
             <div className="empty-state">
-              <span className="empty-state__icon">🤖</span>
+              <span className="empty-state__icon"><i className="ti-face-sad"></i></span>
               <span className="empty-state__title">
                 {search ? 'Không tìm thấy kết quả' : 'Chưa có AI Agent nào'}
               </span>
