@@ -1,17 +1,15 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import type { Bot, Brand } from '../../types';
 
 interface AgentLayoutProps {
   children: React.ReactNode;
+  bot?: Bot | null;
+  brand?: Brand | null;
+  loading?: boolean;
 }
 
 const MENU_GROUPS = [
-  {
-    title: '',
-    items: [
-      { id: 'dashboard', label: 'Dashboard', icon: 'ti-bar-chart' },
-    ]
-  },
   {
     title: 'ĐÀO TẠO',
     items: [
@@ -20,17 +18,15 @@ const MENU_GROUPS = [
       { id: 'goals', label: 'Mục tiêu', icon: 'ti-flag' },
       { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
       { id: 'skills', label: 'Skills', icon: 'ti-bolt' },
-      { id: 'policy', label: 'Chính sách', icon: 'ti-shield' },
-      { id: 'escalation', label: 'Quy tắc leo thang', icon: 'ti-alert' },
-      { id: 'feedback', label: 'Phản hồi', icon: 'ti-comment-alt' },
+      { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
+      { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
+      { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
     ]
   },
   {
     title: 'KIỂM THỬ',
     items: [
       { id: 'simulator', label: 'Chat Simulator', icon: 'ti-headphone-alt' },
-      { id: 'scenario', label: 'Scenario Testing', icon: 'ti-pulse' },
-      { id: 'test-history', label: 'Lịch sử kiểm thử', icon: 'ti-time' },
     ]
   },
   {
@@ -44,11 +40,20 @@ const MENU_GROUPS = [
       { id: 'ui-ux', label: 'Giao diện & Trải nghiệm', icon: 'ti-palette' },
     ]
   },
-
 ];
 
-const AgentLayout: React.FC<AgentLayoutProps> = ({ children }) => {
+function getInitials(name: string) {
+  if (!name) return 'AI';
+  return name.split(/[\s—–\-]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+}
+
+const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading }) => {
   const navigate = useNavigate();
+
+  const botName = bot?.name || 'Loading...';
+  const brandName = brand?.name ? ` — ${brand.name}` : '';
+  const displayName = `${botName}${brandName}`;
+  const isActive = bot?.status === 'active';
 
   return (
     <div className="agent-layout">
@@ -59,20 +64,24 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children }) => {
         </button>
 
         <div className="sidebar-brand">
-          <div className="agent-avatar" style={{ width: 32, height: 32, fontSize: 12 }}>SC</div>
+          <div className="agent-avatar" style={{ width: 32, height: 32, fontSize: 12 }}>
+            {getInitials(botName)}
+          </div>
           <div className="sidebar-brand-info">
-            <strong>Lumi — Seoul Center</strong>
-            <span className="badge badge--active" style={{ transform: 'scale(0.85)', transformOrigin: 'left' }}>Production</span>
+            <strong title={displayName}>{displayName}</strong>
+            {!loading && (
+              <span className={`badge ${isActive ? 'badge--active' : 'badge--inactive'}`} style={{ transform: 'scale(0.85)', transformOrigin: 'left' }}>
+                {isActive ? 'Hoạt động' : 'Tắt'}
+              </span>
+            )}
           </div>
         </div>
 
         <nav className="sidebar-nav">
-
           {MENU_GROUPS.map((group, index) => (
             <div key={group.title || index} className="sidebar-group">
               {group.title && <span className="sidebar-group-title">{group.title}</span>}
               {group.items.map(item => (
-                // This is a mockup layout, later we can use NavLink with exact path
                 <button
                   key={item.id}
                   className={`sidebar-nav-item ${item.id === 'general' ? 'active' : ''}`}
@@ -92,10 +101,14 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children }) => {
           <div className="agent-breadcrumb">
             <span style={{ color: 'var(--color-text-sub)' }}>Agents</span>
             <span style={{ margin: '0 8px', color: 'var(--color-border)' }}>&gt;</span>
-            <span style={{ fontWeight: 600 }}>Lumi — Seoul Center</span>
+            <span style={{ fontWeight: 600 }}>{displayName}</span>
           </div>
           <div className="agent-header-actions">
-            <span className="badge badge--active">● Hoạt động</span>
+            {!loading && (
+              <span className={`badge ${isActive ? 'badge--active' : 'badge--inactive'}`}>
+                {isActive ? '● Hoạt động' : '○ Tắt'}
+              </span>
+            )}
           </div>
         </header>
 

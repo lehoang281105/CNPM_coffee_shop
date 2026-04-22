@@ -8,26 +8,7 @@ import { getAllBots } from '../../../services/admin/botService';
 import { getAllBrands } from '../../../services/admin/brandService';
 import type { Bot, Brand } from '../../../types';
 
-// ── Stat Card ────────────────────────────────────────────────────────────────
-interface StatCardProps {
-  iconClass: string;
-  label: string;
-  value: number | null;
-  colorMod: 'blue' | 'green' | 'orange' | 'purple';
-}
-
-const StatCard: React.FC<StatCardProps> = ({ iconClass, label, value, colorMod }) => (
-  <div className="stat-card">
-    <div className={`stat-icon stat-icon--${colorMod}`}><i className={iconClass}></i></div>
-    <div className="stat-info">
-      <span className="stat-label">{label}</span>
-      {value === null
-        ? <span className="stat-value stat-value--skeleton" aria-label="Đang tải" />
-        : <span className="stat-value">{value.toLocaleString()}</span>
-      }
-    </div>
-  </div>
-);
+import StatCard from '../../../components/admin/StatCard';
 
 // ── Dashboard Page ───────────────────────────────────────────────────────────
 const DashboardPage: React.FC = () => {
