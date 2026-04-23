@@ -1,73 +1,31 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import Header from '../../../components/common/Header';
 import AgentCard from '../../../components/admin/AgentCard';
 import CreateBrandModal from '../../../components/admin/CreateBrandModal';
 import CreateBotModal from '../../../components/admin/CreateBotModal';
 import HelpModal from '../../../components/common/HelpModal';
-import { getAllBots } from '../../../services/admin/botService';
-import { getAllBrands } from '../../../services/admin/brandService';
-import type { Bot, Brand } from '../../../types';
-
 import StatCard from '../../../components/admin/StatCard';
+import { useDashboard } from '../../../hooks/admin/useDashboard';
 
 // ── Dashboard Page ───────────────────────────────────────────────────────────
 const DashboardPage: React.FC = () => {
-  const [bots,    setBots]    = useState<Bot[]>([]);
-  const [brands,  setBrands]  = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState('');
-  const [search,  setSearch]  = useState('');
+  const {
+    loading,
+    error,
+    search,
+    setSearch,
+    filteredBots,
+    fetchData,
+    totalBots,
+    activeBots,
+    totalBrands,
+    totalLangs,
+    brandMap,
+  } = useDashboard();
+
   const [showBrandModal, setShowBrandModal] = useState(false);
   const [showBotModal,   setShowBotModal]   = useState(false);
   const [showHelpModal,  setShowHelpModal]  = useState(false);
-
-  // ── Fetch ────────────────────────────────────────────────────────────────
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const [botsRes, brandsRes] = await Promise.all([
-        getAllBots(),
-        getAllBrands(),
-      ]);
-      setBots(botsRes.data   ?? []);
-      setBrands(brandsRes.data ?? []);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message
-          || err.message
-          || 'Không thể kết nối tới API. Vui lòng thử lại.'
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  // ── Derived stats ────────────────────────────────────────────────────────
-  const totalBots     = loading ? null : bots.length;
-  const activeBots    = loading ? null : bots.filter((b) => b.status === 'active').length;
-  const totalBrands   = loading ? null : brands.length;
-  const totalLangs    = loading ? null : new Set(bots.flatMap((b) => b.language)).size;
-
-  // ── Brand map ────────────────────────────────────────────────────────────
-  const brandMap = useMemo(
-    () => Object.fromEntries(brands.map((b) => [b.id, b])),
-    [brands]
-  );
-
-  // ── Filtered bots ────────────────────────────────────────────────────────
-  const filteredBots = useMemo(() => {
-    const q = search.toLowerCase();
-    return bots.filter(
-      (b) =>
-        b.name.toLowerCase().includes(q) ||
-        (b.role_prompt ?? '').toLowerCase().includes(q) ||
-        b.language.some((l) => l.toLowerCase().includes(q)) ||
-        (brandMap[b.brand_id]?.name ?? '').toLowerCase().includes(q)
-    );
-  }, [bots, search, brandMap]);
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
