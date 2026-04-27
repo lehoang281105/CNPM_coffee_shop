@@ -30,6 +30,7 @@ const Branches: React.FC<BranchesProps> = ({ brandId }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [deletingBranch, setDeletingBranch] = useState<Branch | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [notification, setNotification] = useState<{
     title: string;
@@ -103,17 +104,16 @@ const Branches: React.FC<BranchesProps> = ({ brandId }) => {
     }
   };
 
-  const handleDelete = async (branch: Branch) => {
-    const confirmed = window.confirm(`Bạn có chắc muốn xóa chi nhánh "${branch.name}"?`);
-    if (!confirmed) return;
-
+  const handleConfirmDelete = async () => {
+    if (!deletingBranch) return;
     try {
-      await deleteBranchItem(branch.id);
+      await deleteBranchItem(deletingBranch.id);
       setNotification({
         title: 'Thành công',
         message: 'Đã xóa chi nhánh.',
         type: 'success',
       });
+      setDeletingBranch(null);
     } catch (err: any) {
       setNotification({
         title: 'Lỗi',
@@ -214,7 +214,7 @@ const Branches: React.FC<BranchesProps> = ({ brandId }) => {
                             type="button"
                             className="branch-action-btn danger"
                             title="Xóa"
-                            onClick={() => handleDelete(branch)}
+                            onClick={() => setDeletingBranch(branch)}
                             disabled={submitting}
                           >
                             <i className="ti-trash"></i>
@@ -280,6 +280,58 @@ const Branches: React.FC<BranchesProps> = ({ brandId }) => {
           onClose={closeModal}
           onSubmit={handleSubmit}
         />
+      )}
+
+      {deletingBranch && (
+        <div
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setDeletingBranch(null)}
+        >
+          <div
+            className="modal branch-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="branch-delete-title"
+          >
+            <div className="modal-header">
+              <h2 className="modal-title" id="branch-delete-title">
+                Xác nhận xóa chi nhánh
+              </h2>
+              <button
+                className="modal-close"
+                onClick={() => setDeletingBranch(null)}
+                aria-label="Đóng"
+                disabled={submitting}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body branch-delete-body">
+              <p>
+                Bạn có chắc muốn xóa chi nhánh <strong>"{deletingBranch.name}"</strong>?
+              </p>
+              <p className="form-hint">Hành động này không thể hoàn tác.</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => setDeletingBranch(null)}
+                disabled={submitting}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                className="btn btn--danger"
+                onClick={handleConfirmDelete}
+                disabled={submitting}
+              >
+                {submitting ? 'Đang xóa...' : 'Xóa chi nhánh'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {notification && (

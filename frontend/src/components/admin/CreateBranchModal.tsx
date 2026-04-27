@@ -127,7 +127,7 @@ const CreateBranchModal: React.FC<BranchModalProps> = ({
 
     await onSubmit({
       ...payloadBase,
-      brand_id: brand?.brand_id ?? brandId ?? undefined,
+      brand_id: branch?.brand_id ?? brandId ?? undefined,
     });
   };
 
