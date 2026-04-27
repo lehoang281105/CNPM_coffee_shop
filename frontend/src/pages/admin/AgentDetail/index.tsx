@@ -39,23 +39,6 @@ const AgentDetailPage: React.FC = () => {
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
           <>
-            <div className="agent-detail-tab-switcher">
-              <button
-                type="button"
-                className={`agent-detail-tab-btn ${activeTab === 'general' ? 'active' : ''}`}
-                onClick={() => setActiveTab('general')}
-              >
-                Tri thức
-              </button>
-              <button
-                type="button"
-                className={`agent-detail-tab-btn ${activeTab === 'branches' ? 'active' : ''}`}
-                onClick={() => setActiveTab('branches')}
-              >
-                Chi nhánh
-              </button>
-            </div>
-
             {activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : (
