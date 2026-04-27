@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { Bot, Brand } from '../../types';
 
 interface AgentLayoutProps {
@@ -7,6 +7,8 @@ interface AgentLayoutProps {
   bot?: Bot | null;
   brand?: Brand | null;
   loading?: boolean;
+  activeMenuId?: string;
+  onMenuSelect?: (menuId: string) => void;
 }
 
 const MENU_GROUPS = [
@@ -47,7 +49,14 @@ function getInitials(name: string) {
   return name.split(/[\s—–\-]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 }
 
-const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading }) => {
+const AgentLayout: React.FC<AgentLayoutProps> = ({
+  children,
+  bot,
+  brand,
+  loading,
+  activeMenuId = 'general',
+  onMenuSelect,
+}) => {
   const navigate = useNavigate();
 
   const botName = bot?.name || 'Loading...';
@@ -84,7 +93,8 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
               {group.items.map(item => (
                 <button
                   key={item.id}
-                  className={`sidebar-nav-item ${item.id === 'general' ? 'active' : ''}`}
+                  className={`sidebar-nav-item ${item.id === activeMenuId ? 'active' : ''}`}
+                  onClick={() => onMenuSelect?.(item.id)}
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
                 </button>

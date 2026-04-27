@@ -54,3 +54,40 @@ export interface BrandCreatePayload {
   logo_url?: string;
   status?: string;
 }
+
+// ─── Branch ─────────────────────────────────────────────────────────────────
+export interface Branch {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  name: string;
+  description?: string | null;
+  address: string;
+  google_map_url: string;
+  latitude: string;
+  longitude: string;
+  status: string;
+  brand_id?: string | null;
+}
+
+export interface BranchCreatePayload {
+  name: string;
+  description?: string;
+  address: string;
+  google_map_url: string;
+  latitude: string;
+  longitude: string;
+  status?: string;
+  brand_id?: string;
+}
+
+export interface BranchUpdatePayload {
+  name?: string | null;
+  description?: string | null;
+  address?: string | null;
+  google_map_url?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  status?: string | null;
+  brand_id?: string | null;
+}
