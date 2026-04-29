@@ -82,6 +82,13 @@ const normalizePercent = (value: number | null): number => {
 
 const unique = (items: string[]) => [...new Set(items.filter(Boolean))];
 
+const formatReasoningFlow = (value: string): string =>
+  value
+    .replace(/\r\n?/g, '\n')
+    .replace(/([^\n])\s+(\d+\.\s)/g, '$1\n$2')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
 const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
   if (!response) return EMPTY_DEBUG;
 
@@ -194,7 +201,7 @@ const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
   ]);
 
   return {
-    reasoningFlow: reasoningPieces.join('\n'),
+    reasoningFlow: formatReasoningFlow(reasoningPieces.join('\n\n')),
     intentScores: dedupedIntentScores.sort((a, b) => b.percent - a.percent),
     kbArticles,
     policies,
@@ -217,6 +224,7 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId }
 
   const [input, setInput] = useState('');
   const [collapsedDebug, setCollapsedDebug] = useState(false);
+  const [showReasoningFlow, setShowReasoningFlow] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const messagesRef = useRef<HTMLDivElement | null>(null);
 
@@ -338,10 +346,25 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId }
             {!collapsedDebug && (
               <div className="sim-debug-body">
                 <div className="sim-debug-section">
-                  <h4>Luồng suy luận AI</h4>
-                  <div className="sim-debug-box">
-                    {debugData.reasoningFlow || 'Chưa có dữ liệu suy luận từ phản hồi API.'}
+                  <div className="sim-debug-section-header">
+                    <h4>Luồng suy luận AI</h4>
+                    <button
+                      type="button"
+                      className={`sim-reasoning-toggle ${showReasoningFlow ? 'is-active' : ''}`}
+                      onClick={() => setShowReasoningFlow((prev) => !prev)}
+                      title={showReasoningFlow ? 'Ẩn luồng suy luận' : 'Hiện luồng suy luận'}
+                      aria-expanded={showReasoningFlow}
+                    >
+                      <i className="ti-light-bulb"></i>
+                    </button>
                   </div>
+                  {showReasoningFlow ? (
+                    <div className="sim-debug-box">
+                      {debugData.reasoningFlow || 'Chưa có dữ liệu suy luận từ phản hồi API.'}
+                    </div>
+                  ) : (
+                    <p className="sim-debug-empty-text">Nhấn vào icon để xem chi tiết luồng suy luận</p>
+                  )}
                 </div>
 
                 <div className="sim-debug-section">

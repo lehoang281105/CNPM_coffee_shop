@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+declare const process: {
+  env: {
+    REACT_APP_API_BASE_URL?: string;
+  };
+};
+
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://192.168.30.28:8234/api';
 
 const axiosInstance = axios.create({

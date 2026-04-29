@@ -608,6 +608,41 @@
   letter-spacing: 0.03em;
 }
 
+.sim-debug-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sim-debug-section-header h4 {
+  margin-bottom: 0;
+}
+
+.sim-reasoning-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--color-text-sub);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--ease);
+}
+
+.sim-reasoning-toggle:hover {
+  border-color: #ced7eb;
+  color: #3f5dd6;
+}
+
+.sim-reasoning-toggle.is-active {
+  background: #eef2ff;
+  border-color: #dbe3ff;
+  color: #3f5dd6;
+}
+
 .sim-debug-box {
   border: 1px solid #e6ebf4;
   border-radius: 10px;
