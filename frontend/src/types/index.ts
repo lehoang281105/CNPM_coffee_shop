@@ -106,6 +106,26 @@ export interface Goal {
   target_goal?: string | null;
 }
 
+export interface GoalCreatePayload {
+  name: string;
+  description: string;
+  script: string;
+  intent_id?: string | null;
+  bot_id: string;
+  target_goal?: string | null;
+  rule?: string | null;
+}
+
+export interface GoalUpdatePayload {
+  name?: string | null;
+  description?: string | null;
+  script?: string | null;
+  intent_id?: string | null;
+  bot_id?: string | null;
+  target_goal?: string | null;
+  rule?: string | null;
+}
+
 // ─── Intent ──────────────────────────────────────────────────────────────────
 export interface Intent {
   id: string;

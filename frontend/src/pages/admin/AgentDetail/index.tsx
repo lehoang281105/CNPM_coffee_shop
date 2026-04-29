@@ -4,6 +4,7 @@ import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
 import Branches from './tabs/Đào tạo/Branches';
 import Intents from './tabs/Đào tạo/Intents';
+import Goals from './tabs/Đào tạo/Goals';
 import ChatSimulator from './tabs/Kiểm thử/ChatSimulator';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
@@ -11,7 +12,7 @@ import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'branches' | 'simulator'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator'>('general');
 
   const {
     bot,
@@ -23,7 +24,7 @@ const AgentDetailPage: React.FC = () => {
   } = useAgentDetail(id);
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'branches' || menuId === 'simulator') {
+    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator') {
       setActiveTab(menuId);
     }
   };
@@ -45,6 +46,8 @@ const AgentDetailPage: React.FC = () => {
               <ChatSimulator botId={bot.id} botName={bot.name} brandId={brand?.id || bot.brand_id} />
             ) : activeTab === 'intent' ? (
               <Intents botId={bot.id} />
+            ) : activeTab === 'goals' ? (
+              <Goals botId={bot.id} />
             ) : activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : (
