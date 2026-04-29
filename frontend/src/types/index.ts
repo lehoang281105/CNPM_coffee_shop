@@ -91,3 +91,61 @@ export interface BranchUpdatePayload {
   status?: string | null;
   brand_id?: string | null;
 }
+
+// ─── Chat Simulator ──────────────────────────────────────────────────────────
+export interface ChatUserInfo {
+  user_id: string;
+  name?: string | null;
+  phone?: string | null;
+  description?: string | null;
+  gender?: string | null;
+  language?: string | null;
+}
+
+export interface ChatRequestPayload {
+  user: ChatUserInfo;
+  history?: Record<string, unknown>[] | null;
+  message: string;
+  bot_id: string;
+  brand_id: string;
+  payload?: Record<string, unknown> | null;
+}
+
+export interface IntentReasoning {
+  id?: string | null;
+  reason?: string | null;
+  thought?: string | null;
+  confidence?: number | null;
+  [key: string]: unknown;
+}
+
+export interface GoalReasoning {
+  ids?: string[];
+  reason?: string | null;
+  thought?: string | null;
+  confidence?: number | null;
+  [key: string]: unknown;
+}
+
+export interface ChatReasoning {
+  intent?: IntentReasoning | null;
+  goal?: GoalReasoning | null;
+  [key: string]: unknown;
+}
+
+export interface ChatResponsePayload {
+  response: string[];
+  reasoning?: ChatReasoning | null;
+  message_id?: string | null;
+  user_message_id?: string | null;
+  [key: string]: unknown;
+}
+
+export type ChatMessageRole = 'user' | 'assistant';
+
+export interface ChatMessageItem {
+  id: string;
+  role: ChatMessageRole;
+  content: string;
+  created_at: number;
+}

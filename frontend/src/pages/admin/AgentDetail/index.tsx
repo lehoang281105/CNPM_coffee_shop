@@ -3,13 +3,14 @@ import { useParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
 import Branches from './tabs/Đào tạo/Branches';
+import ChatSimulator from './tabs/Kiểm thử/ChatSimulator';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'general' | 'branches'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'branches' | 'simulator'>('general');
 
   const {
     bot,
@@ -21,7 +22,7 @@ const AgentDetailPage: React.FC = () => {
   } = useAgentDetail(id);
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'branches') {
+    if (menuId === 'general' || menuId === 'branches' || menuId === 'simulator') {
       setActiveTab(menuId);
     }
   };
@@ -39,7 +40,9 @@ const AgentDetailPage: React.FC = () => {
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
           <>
-            {activeTab === 'general' ? (
+            {activeTab === 'simulator' ? (
+              <ChatSimulator botId={bot.id} botName={bot.name} brandId={brand?.id || bot.brand_id} />
+            ) : activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : (
               <Branches brandId={bot.brand_id} />
