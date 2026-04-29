@@ -92,6 +92,48 @@ export interface BranchUpdatePayload {
   brand_id?: string | null;
 }
 
+// ─── Goal ────────────────────────────────────────────────────────────────────
+export interface Goal {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  name: string;
+  description: string;
+  script?: string | null;
+  intent_id?: string | null;
+  bot_id: string;
+  rule?: string | null;
+  target_goal?: string | null;
+}
+
+// ─── Intent ──────────────────────────────────────────────────────────────────
+export interface Intent {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  name: string;
+  description: string;
+  target_goal?: string | null;
+  example?: unknown;
+  bot_id: string;
+}
+
+export interface IntentCreatePayload {
+  name: string;
+  description: string;
+  target_goal?: string | null;
+  example?: unknown;
+  bot_id: string;
+}
+
+export interface IntentUpdatePayload {
+  name?: string | null;
+  description?: string | null;
+  target_goal?: string | null;
+  example?: unknown;
+  bot_id?: string | null;
+}
+
 // ─── Chat Simulator ──────────────────────────────────────────────────────────
 export interface ChatUserInfo {
   user_id: string;
