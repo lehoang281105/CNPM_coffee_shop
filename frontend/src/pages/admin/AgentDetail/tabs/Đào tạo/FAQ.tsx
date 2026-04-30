@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import FAQUpsertModal from '../../../../../components/admin/FAQUpsertModal';
+import NotificationModal from '../../../../../components/common/NotificationModal';
 import { useFAQ } from '../../../../../hooks/admin/useFAQ';
 import type { FAQ as FAQType, FAQCreatePayload, FAQUpdatePayload } from '../../../../../types';
 import './FAQ.css';
@@ -31,6 +32,7 @@ export default function FAQ({ botId }: FAQProps) {
   const [editFAQ, setEditFAQ] = useState<FAQType | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<FAQType | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [notification, setNotification] = useState<{ title: string; message: string; type: 'success' | 'error' } | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,8 +73,19 @@ export default function FAQ({ botId }: FAQProps) {
     try {
       await handleDelete(showDeleteConfirm.id);
       setShowDeleteConfirm(null);
-    } catch {
-      // ignore
+      setNotification({
+        title: 'Xóa thành công',
+        message: 'FAQ đã được xóa khỏi hệ thống.',
+        type: 'success'
+      });
+    } catch (err) {
+      console.error('Error deleting FAQ:', err);
+      setShowDeleteConfirm(null);
+      setNotification({
+        title: 'Xóa thất bại',
+        message: err instanceof Error ? err.message : 'Không thể xóa FAQ. Vui lòng thử lại.',
+        type: 'error'
+      });
     } finally {
       setDeleting(false);
     }
@@ -347,6 +360,16 @@ export default function FAQ({ botId }: FAQProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Notification Modal */}
+      {notification && (
+        <NotificationModal
+          title={notification.title}
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
       )}
     </div>
   );

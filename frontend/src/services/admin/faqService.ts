@@ -30,6 +30,6 @@ export const updateFAQ = (faqId: string, payload: FAQUpdatePayload) =>
     .put<ApiResponse<FAQ>>(`/faqs/${faqId}`, payload)
     .then((r) => r.data);
 
-/** DELETE /api/faqs/:id */
+/** DELETE /api/faqs/:id - Returns 204 No Content */
 export const deleteFAQ = (faqId: string) =>
   axiosInstance.delete(`/faqs/${faqId}`);
