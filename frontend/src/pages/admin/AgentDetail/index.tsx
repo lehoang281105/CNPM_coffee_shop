@@ -5,6 +5,7 @@ import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
 import Branches from './tabs/Đào tạo/Branches';
 import Intents from './tabs/Đào tạo/Intents';
 import Goals from './tabs/Đào tạo/Goals';
+import FAQ from './tabs/Đào tạo/FAQ';
 import ChatSimulator from './tabs/Kiểm thử/ChatSimulator';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
@@ -24,8 +25,8 @@ const AgentDetailPage: React.FC = () => {
   } = useAgentDetail(id);
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator') {
-      setActiveTab(menuId);
+    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq') {
+      setActiveTab(menuId as any);
     }
   };
 
@@ -48,6 +49,8 @@ const AgentDetailPage: React.FC = () => {
               <Intents botId={bot.id} />
             ) : activeTab === 'goals' ? (
               <Goals botId={bot.id} />
+            ) : activeTab === 'faq' ? (
+              <FAQ botId={bot.id} />
             ) : activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : (

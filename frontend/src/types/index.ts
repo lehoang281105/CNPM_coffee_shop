@@ -211,3 +211,25 @@ export interface ChatMessageItem {
   content: string;
   created_at: number;
 }
+
+// ─── FAQ ─────────────────────────────────────────────────────────────────────
+export interface FAQ {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  question: string;
+  answer: string;
+  bot_id: string;
+}
+
+export interface FAQCreatePayload {
+  question: string;
+  answer: string;
+  bot_id: string;
+}
+
+export interface FAQUpdatePayload {
+  question?: string | null;
+  answer?: string | null;
+  bot_id?: string | null;
+}
