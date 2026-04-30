@@ -484,6 +484,8 @@
 
 .sim-message-row--assistant {
   justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .sim-message-bubble {
@@ -507,6 +509,29 @@
   border: 1px solid #e7ebf4;
   color: var(--color-text);
   border-top-left-radius: 8px;
+}
+
+.sim-feedback-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--ease);
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.sim-feedback-btn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
 }
 
 .sim-chat-input-wrap {

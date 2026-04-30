@@ -6,6 +6,7 @@ interface ChatSimulatorProps {
   botId?: string;
   botName?: string;
   brandId?: string;
+  onSwitchToFeedback?: () => void;
 }
 
 interface DebugIntentScore {
@@ -210,7 +211,7 @@ const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
   };
 };
 
-const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId }) => {
+const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, onSwitchToFeedback }) => {
   const {
     messages,
     latestResponse,
@@ -307,9 +308,27 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId }
                     message.role === 'user' ? 'sim-message-row--user' : 'sim-message-row--assistant'
                   }`}
                 >
-                  <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
-                    {message.content}
-                  </div>
+                  {message.role === 'assistant' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px', maxWidth: '82%' }}>
+                      <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
+                        {message.content}
+                      </div>
+                      {onSwitchToFeedback && (
+                        <button
+                          type="button"
+                          className="sim-feedback-btn"
+                          onClick={onSwitchToFeedback}
+                          title="Báo sai"
+                        >
+                          👎 Báo sai
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
+                      {message.content}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

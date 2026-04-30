@@ -21,6 +21,7 @@ const MENU_GROUPS = [
       { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
       { id: 'skills', label: 'Skills', icon: 'ti-bolt' },
       { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
+      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
       { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
       { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
     ]

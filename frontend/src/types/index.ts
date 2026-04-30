@@ -233,3 +233,41 @@ export interface FAQUpdatePayload {
   answer?: string | null;
   bot_id?: string | null;
 }
+
+// ─── Feedback ────────────────────────────────────────────────────────────────
+export interface Feedback {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  bot_id: string;
+  message_id?: string | null;
+  original_question: string;
+  original_answer: string;
+  corrected_answer?: string | null;
+  rating: string; // "pending" | "positive" | "negative"
+  status: string; // "pending" | "saved_to_faq" | "reported_to_dev" | "dev_fixed" | "dismissed"
+  faq_id?: string | null;
+  note?: string | null;
+}
+
+export interface FeedbackCreatePayload {
+  bot_id: string;
+  message_id?: string | null;
+  original_question: string;
+  original_answer: string;
+  rating?: string | null;
+  note?: string | null;
+}
+
+export interface FeedbackRatingPayload {
+  rating: string;
+}
+
+export interface FeedbackSavePayload {
+  corrected_answer: string;
+  note?: string | null;
+}
+
+export interface FeedbackReportDevPayload {
+  note: string;
+}
