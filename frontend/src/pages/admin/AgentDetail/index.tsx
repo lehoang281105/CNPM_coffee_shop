@@ -2,12 +2,15 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
+import KnowledgeTab from './tabs/Tri thức';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [activeTab, setActiveTab] = React.useState('knowledge'); // default to knowledge to see the new page
+  
   const {
     bot,
     brand,
@@ -19,11 +22,17 @@ const AgentDetailPage: React.FC = () => {
 
   return (
     <>
-      <AgentLayout bot={bot} brand={brand} loading={loading}>
+      <AgentLayout bot={bot} brand={brand} loading={loading} activeTab={activeTab} onTabChange={setActiveTab}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
-          <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
+          <>
+            {activeTab === 'general' && <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />}
+            {activeTab === 'knowledge' && <KnowledgeTab bot={id} brandId={brand?.id} />}
+            {activeTab !== 'general' && activeTab !== 'knowledge' && (
+               <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>Tính năng đang phát triển...</div>
+            )}
+          </>
         ) : (
           <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>Không tìm thấy Agent!</div>
         )}
