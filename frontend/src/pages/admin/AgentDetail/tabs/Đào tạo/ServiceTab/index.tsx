@@ -13,14 +13,22 @@ const ServiceTab: React.FC<ServiceTabProps> = ({ botId, brandId }) => {
 
   return (
     <div className="service-tab-container">
-      <div className="service-tab-header">
-        <button 
+      {/* Header */}
+      <div className="service-page-header">
+        <div>
+          <h1 className="service-page-title">Dịch vụ</h1>
+          <p className="service-page-subtitle">Quản lý danh sách dịch vụ và danh mục của thương hiệu</p>
+        </div>
+      </div>
+      {/* Sub-tab Switcher */}
+      <div className="service-subtab-bar">
+        <button
           className={`sub-tab-btn ${activeSubTab === 'services' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('services')}
         >
           Danh sách dịch vụ
         </button>
-        <button 
+        <button
           className={`sub-tab-btn ${activeSubTab === 'catalogs' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('catalogs')}
         >
@@ -28,10 +36,9 @@ const ServiceTab: React.FC<ServiceTabProps> = ({ botId, brandId }) => {
         </button>
       </div>
 
-      <div className="service-tab-content">
-        {activeSubTab === 'services' && <ServiceList brandId={brandId} />}
-        {activeSubTab === 'catalogs' && <CatalogList brandId={brandId} />}
-      </div>
+      {/* Content */}
+      {activeSubTab === 'services' && <ServiceList brandId={brandId} />}
+      {activeSubTab === 'catalogs' && <CatalogList brandId={brandId} />}
     </div>
   );
 };
