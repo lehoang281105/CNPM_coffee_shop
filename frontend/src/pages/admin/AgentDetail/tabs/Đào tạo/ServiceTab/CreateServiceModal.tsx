@@ -4,6 +4,11 @@ import * as catalogService from '../../../../../../services/admin/catalogService
 import type { Service, ServiceCatalog } from '../../../../../../types';
 import './ServiceTab.css';
 
+interface ConditionalPrice {
+  name: string;
+  price: number | string;
+}
+
 interface CreateServiceModalProps {
   onClose: () => void;
   onSuccess: () => void;
@@ -34,28 +39,56 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
   const [tags, setTags] = useState(meta.tags?.join(', ') || '');
   const [generalPrice, setGeneralPrice] = useState<number | string>(meta.general_price ?? '');
 
+  // Conditional prices
+  const [conditionalPrices, setConditionalPrices] = useState<ConditionalPrice[]>(
+    (meta.conditional_prices || []).map((cp: any) => ({ name: cp.name || '', price: cp.price ?? '' }))
+  );
+
   const [catalogs, setCatalogs] = useState<ServiceCatalog[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     catalogService.getAllCatalogs()
-      .then(res => setCatalogs(res.data || []))
+      .then(res => {
+        const all = res.data || [];
+        // Chỉ hiện danh mục của brand hiện tại
+        const filtered = selectedBrandId
+          ? all.filter(c => c.brand_id === selectedBrandId)
+          : all;
+        setCatalogs(filtered);
+      })
       .catch(err => console.error('Failed to load catalogs', err));
-  }, []);
+  }, [selectedBrandId]);
 
+  // ── Conditional price handlers ──────────────────────────────────
+  const addConditionalPrice = () => {
+    setConditionalPrices(prev => [...prev, { name: '', price: '' }]);
+  };
+
+  const removeConditionalPrice = (index: number) => {
+    setConditionalPrices(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateConditionalPrice = (index: number, field: keyof ConditionalPrice, value: string) => {
+    setConditionalPrices(prev =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // ── Image upload ───────────────────────────────────────────────
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Kích thước tệp tối đa là 5 MB.');
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { alert('Kích thước tệp tối đa là 5 MB.'); return; }
     const reader = new FileReader();
     reader.onloadend = () => setImageBase64(reader.result as string);
     reader.readAsDataURL(file);
   };
 
+  // ── Submit ────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!serviceCode || !name || !catalogId) {
@@ -64,6 +97,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
     }
     setLoading(true);
     setError(null);
+
     const payload = {
       name,
       description,
@@ -78,9 +112,13 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
         image_url: imageBase64,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
         general_price: Number(generalPrice) || 0,
-        conditional_prices: meta.conditional_prices || [],
+        conditional_prices: conditionalPrices.map(cp => ({
+          name: cp.name,
+          price: Number(cp.price) || 0,
+        })),
       },
     };
+
     try {
       if (serviceToEdit) {
         await serviceService.updateService(serviceToEdit.id, payload);
@@ -97,7 +135,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
 
   return (
     <div className="svc-modal-overlay">
-      <div className="svc-modal" style={{ maxWidth: 960, width: '90vw' }}>
+      <div className="svc-modal" style={{ maxWidth: 1100, width: '96vw' }}>
         {/* Header */}
         <div className="svc-modal-header">
           <span className="svc-modal-title">
@@ -106,13 +144,12 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
           <button className="svc-modal-close" onClick={onClose}>×</button>
         </div>
 
-        {/* Body */}
         <form onSubmit={handleSubmit}>
           <div className="svc-modal-body">
             {error && <div className="svc-error-bar">{error}</div>}
 
             <div className="svc-modal-two-col">
-              {/* LEFT column */}
+              {/* ── LEFT column ─────────────────────────────────── */}
               <div className="svc-modal-col-main">
                 <div className="svc-form-grid">
                   <div className="svc-form-group">
@@ -169,7 +206,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                   </div>
 
                   <div className="svc-form-group">
-                    <label className="svc-form-label">Thời lượng</label>
+                    <label className="svc-form-label">Thời lượng dịch vụ</label>
                     <div className="svc-form-input-wrap">
                       <input
                         type="number"
@@ -197,6 +234,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                   />
                 </div>
 
+                {/* Image upload */}
                 <div className="svc-form-group">
                   <label className="svc-form-label">Hình ảnh dịch vụ</label>
                   <div className="svc-upload-area">
@@ -224,8 +262,9 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                 </div>
               </div>
 
-              {/* RIGHT column */}
+              {/* ── RIGHT column ────────────────────────────────── */}
               <div className="svc-modal-col-side">
+                {/* Toggle */}
                 <div className="svc-switch-row">
                   <span className="svc-switch-label">Trạng thái</span>
                   <label className="svc-switch">
@@ -238,6 +277,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                   </label>
                 </div>
 
+                {/* Tags */}
                 <div className="svc-form-group">
                   <label className="svc-form-label">Tag</label>
                   <input
@@ -252,6 +292,7 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                   </span>
                 </div>
 
+                {/* General price */}
                 <div className="svc-form-group">
                   <label className="svc-form-label">Giá chung</label>
                   <input
@@ -263,15 +304,53 @@ const CreateServiceModal: React.FC<CreateServiceModalProps> = ({
                   />
                 </div>
 
+                {/* Conditional prices */}
                 <div className="svc-form-group">
-                  <label className="svc-form-label">Giá điều kiện</label>
-                  <button
-                    type="button"
-                    className="svc-btn svc-btn--outline"
-                    style={{ width: '100%', justifyContent: 'center' }}
-                  >
-                    + Thêm giá
-                  </button>
+                  <div className="svc-cond-price-header">
+                    <label className="svc-form-label" style={{ margin: 0 }}>Giá điều kiện</label>
+                    <button
+                      type="button"
+                      className="svc-btn svc-btn--outline svc-btn--sm"
+                      onClick={addConditionalPrice}
+                    >
+                      + Thêm giá
+                    </button>
+                  </div>
+
+                  {conditionalPrices.length === 0 ? (
+                    <div className="svc-cond-price-empty">
+                      Chưa có giá điều kiện nào
+                    </div>
+                  ) : (
+                    <div className="svc-cond-price-list">
+                      {conditionalPrices.map((cp, idx) => (
+                        <div key={idx} className="svc-cond-price-row">
+                          <input
+                            type="text"
+                            className="svc-form-input svc-cond-name"
+                            placeholder="Tên giá (VD: Combo 3 buổi)"
+                            value={cp.name}
+                            onChange={e => updateConditionalPrice(idx, 'name', e.target.value)}
+                          />
+                          <input
+                            type="number"
+                            className="svc-form-input svc-cond-price"
+                            placeholder="Giá"
+                            value={cp.price}
+                            onChange={e => updateConditionalPrice(idx, 'price', e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="svc-cond-remove"
+                            onClick={() => removeConditionalPrice(idx)}
+                            title="Xóa"
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

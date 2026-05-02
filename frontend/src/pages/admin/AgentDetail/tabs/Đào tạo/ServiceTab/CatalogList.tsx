@@ -139,7 +139,7 @@ const CatalogList: React.FC<CatalogListProps> = ({ brandId }) => {
                 <tr key={catalog.id}>
                   <td className="service-name-cell">{catalog.category_name}</td>
                   <td className="service-muted">{brandsMap[catalog.brand_id] || catalog.brand_id}</td>
-                  <td className="service-muted">—</td>
+                  <td className="service-muted">{catalog.description || '—'}</td>
                   <td>
                     <div className="service-action-cell">
                       <button

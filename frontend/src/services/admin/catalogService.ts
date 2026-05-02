@@ -14,11 +14,11 @@ export const getCatalogById = (catalogId: string) =>
   axiosInstance.get<ApiResponse<ServiceCatalog>>(`/catalogs/${catalogId}`).then((r) => r.data);
 
 /** POST /api/catalogs */
-export const createCatalog = (payload: { category_name: string; brand_id: string; service_ids?: string[] }) =>
+export const createCatalog = (payload: { category_name: string; brand_id: string; service_ids?: string[]; description?: string }) =>
   axiosInstance.post<ApiResponse<ServiceCatalog>>('/catalogs', payload).then((r) => r.data);
 
 /** PUT /api/catalogs/:id */
-export const updateCatalog = (catalogId: string, payload: Partial<{ category_name: string; brand_id: string; service_ids: string[] }>) =>
+export const updateCatalog = (catalogId: string, payload: Partial<{ category_name: string; brand_id: string; service_ids: string[]; description: string }>) =>
   axiosInstance.put<ApiResponse<ServiceCatalog>>(`/catalogs/${catalogId}`, payload).then((r) => r.data);
 
 /** DELETE /api/catalogs/:id */

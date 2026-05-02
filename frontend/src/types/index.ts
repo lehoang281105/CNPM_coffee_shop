@@ -61,6 +61,7 @@ export interface ServiceCatalog {
   category_name: string;
   brand_id: string;
   service_ids: string[];
+  description?: string;
   created_at: number;
   updated_at: number;
 }

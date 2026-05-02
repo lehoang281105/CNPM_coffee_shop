@@ -19,7 +19,7 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
   catalogToEdit,
 }) => {
   const [categoryName, setCategoryName] = useState(catalogToEdit?.category_name || '');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(catalogToEdit?.description || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +28,7 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!categoryName || !selectedBrandId) {
+    if (!categoryName.trim() || !selectedBrandId) {
       setError('Vui lòng điền các trường bắt buộc (*)');
       return;
     }
@@ -39,11 +39,15 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
         await catalogService.updateCatalog(catalogToEdit.id, {
           category_name: categoryName,
           brand_id: selectedBrandId,
+          service_ids: catalogToEdit.service_ids || [],
+          description: description || undefined,
         });
       } else {
         await catalogService.createCatalog({
           category_name: categoryName,
           brand_id: selectedBrandId,
+          service_ids: [],
+          description: description || undefined,
         });
       }
       onSuccess();
@@ -65,7 +69,6 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
           <button className="svc-modal-close" onClick={onClose}>×</button>
         </div>
 
-        {/* Body */}
         <form onSubmit={handleSubmit}>
           <div className="svc-modal-body">
             {error && <div className="svc-error-bar">{error}</div>}
@@ -109,13 +112,9 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
                 value={description}
                 onChange={e => setDescription(e.target.value)}
               />
-              <span style={{ fontSize: 11, color: 'var(--color-text-sub)', marginTop: 2 }}>
-                Trường mô tả hiện chưa được lưu vào API.
-              </span>
             </div>
           </div>
 
-          {/* Footer */}
           <div className="svc-modal-footer">
             <button type="button" className="svc-btn svc-btn--ghost" onClick={onClose} disabled={loading}>
               Đóng
