@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axiosInstance from '../../../../../services/axiosInstance';
-import type { KnowledgeDocument, KnowledgeFAQ, MassModule } from '../../../../../types';
+import { useKnowledge } from '../../../../../hooks/admin/useKnowledge';
 import StatCard from '../../../../../components/knowledge/StatCard';
 import AddKnowledgeModal from '../../../../../components/knowledge/AddKnowledgeModal';
-import { mockIntegrations } from './mockData';
 import { IconBrand, IconAgent, IconChatbot, IconTotal, IconSync } from '../../../../../components/common/Icons';
 
 import BrandSection from './components/BrandSection';
@@ -19,13 +17,17 @@ interface KnowledgeTabProps {
 const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ bot, brandId }) => {
   const { id: agentId } = useParams<{ id: string }>();
   
-  const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
-  const [faqs, setFaqs] = useState<KnowledgeFAQ[]>([]);
-  const [massModules, setMassModules] = useState<MassModule[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const {
+    documents,
+    faqs,
+    massModules,
+    loading,
+    error,
+    isToggling,
+    toggleMassModule
+  } = useKnowledge(agentId);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-  const [isToggling, setIsToggling] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   
   const [expandedSections, setExpandedSections] = useState({
     brand: true,
@@ -35,85 +37,6 @@ const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ bot, brandId }) => {
 
   const toggleSection = (section: 'brand' | 'agent' | 'chatbot') => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  useEffect(() => {
-    const fetchKnowledgeData = async () => {
-      if (!agentId) return;
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const [docsRes, faqsRes] = await Promise.all([
-          axiosInstance.get('/documents', { params: { page: 1, page_size: 100 } }),
-          axiosInstance.get('/faqs', { params: { bot_id: agentId, page: 1, page_size: 100 } })
-        ]);
-
-        const fetchedDocs = docsRes.data?.data || [];
-        const fetchedFaqs = faqsRes.data?.data || [];
-
-        let fetchedMassModules: MassModule[] = [];
-        try {
-          const massRes = await axiosInstance.get('/mass-modules', { params: { bot_id: agentId } });
-          fetchedMassModules = massRes.data?.data || [];
-        } catch (err) {
-          console.warn("API /mass-modules chưa khả dụng, sử dụng fallback mock data.");
-          fetchedMassModules = mockIntegrations.map(m => ({
-            id: m.id,
-            code: m.id,
-            title: m.title,
-            description: m.subtext,
-            is_enabled: m.checked,
-            record_count: m.count
-          }));
-        }
-
-        setDocuments(fetchedDocs);
-        setFaqs(fetchedFaqs);
-        setMassModules(fetchedMassModules);
-
-      } catch (err) {
-        console.error("Error fetching knowledge:", err);
-        setError("Không thể tải dữ liệu tri thức. Vui lòng kiểm tra lại kết nối.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchKnowledgeData();
-  }, [agentId]);
-
-  const handleToggleMassModule = async (moduleId: string, currentStatus: boolean) => {
-    setIsToggling(moduleId);
-    
-    // Optimistic Update: Update UI instantly
-    setMassModules(prev => prev.map(m => 
-      m.id === moduleId ? { ...m, is_enabled: !currentStatus } : m
-    ));
-
-    try {
-      // TẠM THỜI MOCK API ĐỂ TEST UI (Do Backend chưa có API này)
-      // Chờ 500ms để mô phỏng thời gian gọi mạng
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Khi nào Backend code xong, bạn mở comment dòng dưới này ra:
-      /*
-      await axiosInstance.patch(`/mass-modules/${moduleId}/toggle`, { 
-        is_enabled: !currentStatus, 
-        bot_id: agentId 
-      });
-      */
-    } catch (err) {
-      console.error("Error toggling module:", err);
-      // Rollback on error
-      setMassModules(prev => prev.map(m => 
-        m.id === moduleId ? { ...m, is_enabled: currentStatus } : m
-      ));
-      // Tạm tắt alert để bạn test UI không bị phiền
-      // alert("Đã xảy ra lỗi khi thay đổi trạng thái module. Vui lòng thử lại.");
-    } finally {
-      setIsToggling(null);
-    }
   };
 
   // Derived Stats
@@ -181,7 +104,7 @@ const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ bot, brandId }) => {
             isExpanded={expandedSections.chatbot}
             onToggle={() => toggleSection('chatbot')}
             isToggling={isToggling}
-            onToggleModule={handleToggleMassModule}
+            onToggleModule={toggleMassModule}
           />
         </div>
       )}

@@ -107,3 +107,19 @@ export interface IntegrationRowProps {
   iconBgColor?: string;
   iconColor?: string;
 }
+
+// ─── Skills ─────────────────────────────────────────────────────────────────
+export interface SkillBaseResponse {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  name: string;
+  description: string;
+  endpoint: string;
+  method: string;
+  parameters: any;
+  fixed_parameters: any;
+  headers: any;
+  is_active: boolean;
+  brand_id: string;
+}
