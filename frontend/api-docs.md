@@ -2912,6 +2912,49 @@
         }
       }
     },
+    "/api/chat/reset": {
+      "delete": {
+        "tags": [
+          "[Current] v1 - api_chat",
+          "Chat"
+        ],
+        "summary": "Reset Session",
+        "description": "Xóa toàn bộ LongTerm, GoalProgress và Message của User trong Bot này (coi như chat lại từ đầu).",
+        "operationId": "reset_session_api_chat_reset_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/chat": {
       "post": {
         "tags": [
@@ -2937,6 +2980,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/chat/reset": {
+      "delete": {
+        "tags": [
+          "v1 - api_chat",
+          "Chat"
+        ],
+        "summary": "Reset Session",
+        "description": "Xóa toàn bộ LongTerm, GoalProgress và Message của User trong Bot này (coi như chat lại từ đầu).",
+        "operationId": "reset_session_api_v1_chat_reset_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
                 }
               }
             }
@@ -6082,6 +6168,686 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/conversations": {
+      "get": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get Conversations",
+        "description": "Lấy danh sách các cuộc trò chuyện của một brand.",
+        "operationId": "get_conversations_api_inbox_conversations_get",
+        "parameters": [
+          {
+            "name": "brand_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Brand Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxConversationListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/messages": {
+      "get": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get Messages",
+        "description": "Lấy chi tiết tin nhắn của một cuộc trò chuyện.",
+        "operationId": "get_messages_api_inbox_messages_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxMessageListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/takeover": {
+      "post": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Takeover Conversation",
+        "description": "Human agent can thiệp vào cuộc trò chuyện, bot sẽ im lặng.",
+        "operationId": "takeover_conversation_api_inbox_takeover_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxTakeoverRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/resolve": {
+      "post": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Resolve Conversation",
+        "description": "Trả lại quyền trả lời cho AI bot.",
+        "operationId": "resolve_conversation_api_inbox_resolve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxResolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/reply": {
+      "post": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Reply To User",
+        "description": "Human agent gửi tin nhắn cho khách hàng.",
+        "operationId": "reply_to_user_api_inbox_reply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxReplyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inbox/conversations/{user_id}/{bot_id}/profile": {
+      "get": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get User Profile",
+        "description": "Lấy thông tin profile/CRM của người dùng.",
+        "operationId": "get_user_profile_api_inbox_conversations__user_id___bot_id__profile_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "[Current] v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Update User Profile",
+        "description": "Nhân viên cập nhật thông tin profile/CRM của người dùng.",
+        "operationId": "update_user_profile_api_inbox_conversations__user_id___bot_id__profile_put",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/conversations": {
+      "get": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get Conversations",
+        "description": "Lấy danh sách các cuộc trò chuyện của một brand.",
+        "operationId": "get_conversations_api_v1_inbox_conversations_get",
+        "parameters": [
+          {
+            "name": "brand_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Brand Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxConversationListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/messages": {
+      "get": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get Messages",
+        "description": "Lấy chi tiết tin nhắn của một cuộc trò chuyện.",
+        "operationId": "get_messages_api_v1_inbox_messages_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxMessageListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/takeover": {
+      "post": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Takeover Conversation",
+        "description": "Human agent can thiệp vào cuộc trò chuyện, bot sẽ im lặng.",
+        "operationId": "takeover_conversation_api_v1_inbox_takeover_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxTakeoverRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/resolve": {
+      "post": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Resolve Conversation",
+        "description": "Trả lại quyền trả lời cho AI bot.",
+        "operationId": "resolve_conversation_api_v1_inbox_resolve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxResolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/reply": {
+      "post": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Reply To User",
+        "description": "Human agent gửi tin nhắn cho khách hàng.",
+        "operationId": "reply_to_user_api_v1_inbox_reply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxReplyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inbox/conversations/{user_id}/{bot_id}/profile": {
+      "get": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Get User Profile",
+        "description": "Lấy thông tin profile/CRM của người dùng.",
+        "operationId": "get_user_profile_api_v1_inbox_conversations__user_id___bot_id__profile_get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "v1 - api_inbox",
+          "Inbox"
+        ],
+        "summary": "Update User Profile",
+        "description": "Nhân viên cập nhật thông tin profile/CRM của người dùng.",
+        "operationId": "update_user_profile_api_v1_inbox_conversations__user_id___bot_id__profile_put",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "bot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bot Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -10925,6 +11691,43 @@
               }
             ],
             "title": "Brand Id"
+          },
+          "working_hours": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Hours"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "crm_schema": {
+            "anyOf": [
+              {
+                "items": {
+
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crm Schema"
           }
         },
         "type": "object",
@@ -11000,6 +11803,44 @@
               }
             ],
             "title": "Brand Id"
+          },
+          "working_hours": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Hours"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone",
+            "default": "Asia/Ho_Chi_Minh"
+          },
+          "crm_schema": {
+            "anyOf": [
+              {
+                "items": {
+
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crm Schema"
           }
         },
         "type": "object",
@@ -11091,6 +11932,43 @@
               }
             ],
             "title": "Brand Id"
+          },
+          "working_hours": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Working Hours"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "crm_schema": {
+            "anyOf": [
+              {
+                "items": {
+
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crm Schema"
           }
         },
         "type": "object",
@@ -11418,6 +12296,17 @@
           "brand_id": {
             "type": "string",
             "title": "Brand Id"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           }
         },
         "type": "object",
@@ -11447,6 +12336,17 @@
           "brand_id": {
             "type": "string",
             "title": "Brand Id"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           }
         },
         "type": "object",
@@ -11494,6 +12394,17 @@
               }
             ],
             "title": "Brand Id"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           }
         },
         "type": "object",
@@ -11575,6 +12486,63 @@
               }
             ]
           },
+          "giai_thich": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Explainability"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rewritten_question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rewritten Question"
+          },
+          "rewritten_question_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rewritten Question Reason"
+          },
+          "answer_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Reason"
+          },
+          "skill_calls": {
+            "items": {
+              "$ref": "#/components/schemas/SkillCallInfo"
+            },
+            "type": "array",
+            "title": "Skill Calls"
+          },
+          "completed_goals": {
+            "items": {
+              "$ref": "#/components/schemas/CompletedGoal"
+            },
+            "type": "array",
+            "title": "Completed Goals"
+          },
           "message_id": {
             "anyOf": [
               {
@@ -11603,6 +12571,41 @@
           "response"
         ],
         "title": "ChatResponse"
+      },
+      "CompletedGoal": {
+        "properties": {
+          "goal_id": {
+            "type": "string",
+            "title": "Goal Id"
+          },
+          "goal_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Name"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "goal_id"
+        ],
+        "title": "CompletedGoal"
       },
       "DataResponse_BotBaseResponse_": {
         "properties": {
@@ -13781,6 +14784,44 @@
         "type": "object",
         "title": "DocumentUpdateRequest"
       },
+      "EvidenceDoc": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "content"
+        ],
+        "title": "EvidenceDoc"
+      },
+      "Explainability": {
+        "properties": {
+          "tai_lieu_lay_ra": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDoc"
+            },
+            "type": "array",
+            "title": "Tai Lieu Lay Ra"
+          },
+          "tai_lieu_su_dung": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDoc"
+            },
+            "type": "array",
+            "title": "Tai Lieu Su Dung"
+          }
+        },
+        "type": "object",
+        "title": "Explainability"
+      },
       "FAQBaseResponse": {
         "properties": {
           "id": {
@@ -14165,6 +15206,46 @@
         ],
         "title": "GoalBaseResponse"
       },
+      "GoalCandidate": {
+        "properties": {
+          "goal_id": {
+            "type": "string",
+            "title": "Goal Id"
+          },
+          "goal_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Name"
+          },
+          "confidence": {
+            "type": "integer",
+            "title": "Confidence"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "goal_id",
+          "confidence"
+        ],
+        "title": "GoalCandidate"
+      },
       "GoalCreateRequest": {
         "properties": {
           "name": {
@@ -14234,6 +15315,13 @@
             },
             "type": "array",
             "title": "Ids"
+          },
+          "names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Names"
           },
           "reason": {
             "anyOf": [
@@ -14368,6 +15456,193 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "InboxConversationItem": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          },
+          "last_message_content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message Content"
+          },
+          "last_message_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Message Time"
+          },
+          "is_read": {
+            "type": "boolean",
+            "title": "Is Read",
+            "default": false
+          },
+          "is_human_takeover": {
+            "type": "boolean",
+            "title": "Is Human Takeover",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id"
+        ],
+        "title": "InboxConversationItem"
+      },
+      "InboxConversationListResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/InboxConversationItem"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "InboxConversationListResponse"
+      },
+      "InboxMessageItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "sender_type": {
+            "type": "string",
+            "title": "Sender Type"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "is_read": {
+            "type": "boolean",
+            "title": "Is Read"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "content",
+          "sender_type",
+          "created_at",
+          "is_read"
+        ],
+        "title": "InboxMessageItem"
+      },
+      "InboxMessageListResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/InboxMessageItem"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "InboxMessageListResponse"
+      },
+      "InboxReplyRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id",
+          "content"
+        ],
+        "title": "InboxReplyRequest"
+      },
+      "InboxResolveRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id"
+        ],
+        "title": "InboxResolveRequest"
+      },
+      "InboxTakeoverRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id"
+        ],
+        "title": "InboxTakeoverRequest"
+      },
       "IntentBaseResponse": {
         "properties": {
           "id": {
@@ -14428,6 +15703,46 @@
         ],
         "title": "IntentBaseResponse"
       },
+      "IntentCandidate": {
+        "properties": {
+          "intent_id": {
+            "type": "string",
+            "title": "Intent Id"
+          },
+          "intent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent Name"
+          },
+          "confidence": {
+            "type": "integer",
+            "title": "Confidence"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intent_id",
+          "confidence"
+        ],
+        "title": "IntentCandidate"
+      },
       "IntentCreateRequest": {
         "properties": {
           "name": {
@@ -14485,6 +15800,17 @@
               }
             ],
             "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
           },
           "reason": {
             "anyOf": [
@@ -14999,6 +16325,20 @@
                 "type": "null"
               }
             ]
+          },
+          "intent_khac": {
+            "items": {
+              "$ref": "#/components/schemas/IntentCandidate"
+            },
+            "type": "array",
+            "title": "Intent Khac"
+          },
+          "goal_khac": {
+            "items": {
+              "$ref": "#/components/schemas/GoalCandidate"
+            },
+            "type": "array",
+            "title": "Goal Khac"
           }
         },
         "type": "object",
@@ -15148,6 +16488,26 @@
         ],
         "title": "RegisterRequest"
       },
+      "ResetSessionRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "ID của người dùng cần reset"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id",
+            "description": "ID của bot liên kết"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id"
+        ],
+        "title": "ResetSessionRequest"
+      },
       "SearchRequest": {
         "properties": {
           "address": {
@@ -15223,7 +16583,8 @@
         "type": "string",
         "enum": [
           "user",
-          "ai"
+          "ai",
+          "human_agent"
         ],
         "title": "SenderType"
       },
@@ -15522,6 +16883,57 @@
           "brand_id"
         ],
         "title": "SkillBaseResponse"
+      },
+      "SkillCallInfo": {
+        "properties": {
+          "skill_name": {
+            "type": "string",
+            "title": "Skill Name"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "skipped": {
+            "type": "boolean",
+            "title": "Skipped",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "skill_name"
+        ],
+        "title": "SkillCallInfo"
       },
       "SkillCreateRequest": {
         "properties": {
@@ -16309,6 +17721,164 @@
           "user_id"
         ],
         "title": "UserInfo"
+      },
+      "UserProfileResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "bot_id": {
+            "type": "string",
+            "title": "Bot Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "extra_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "bot_id"
+        ],
+        "title": "UserProfileResponse"
+      },
+      "UserProfileUpdateRequest": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "extra_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra Data"
+          }
+        },
+        "type": "object",
+        "title": "UserProfileUpdateRequest"
       },
       "UserUpdateRequest": {
         "properties": {

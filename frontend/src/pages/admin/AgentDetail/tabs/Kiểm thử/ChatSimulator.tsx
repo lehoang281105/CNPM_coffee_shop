@@ -14,6 +14,20 @@ interface DebugIntentScore {
   percent: number;
 }
 
+interface DebugSkillCall {
+  skill_name: string;
+  reason: string | null;
+  confidence: number | null;
+  status: string | null;
+  skipped: boolean;
+}
+
+interface DebugCompletedGoal {
+  goal_id: string;
+  goal_name: string | null;
+  reason: string | null;
+}
+
 interface DebugData {
   reasoningFlow: string;
   intentScores: DebugIntentScore[];
@@ -21,6 +35,10 @@ interface DebugData {
   policies: string[];
   tokenInput: number | null;
   tokenOutput: number | null;
+  answerReason: string | null;
+  skillCalls: DebugSkillCall[];
+  completedGoals: DebugCompletedGoal[];
+  userMessageId: string | null;
 }
 
 const EMPTY_DEBUG: DebugData = {
@@ -30,6 +48,10 @@ const EMPTY_DEBUG: DebugData = {
   policies: [],
   tokenInput: null,
   tokenOutput: null,
+  answerReason: null,
+  skillCalls: [],
+  completedGoals: [],
+  userMessageId: null,
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -201,6 +223,37 @@ const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
     ['debug', 'usage', 'completion_tokens'],
   ]);
 
+  const answerReason = typeof response.answer_reason === 'string' ? response.answer_reason : null;
+  const userMessageId = typeof response.user_message_id === 'string' ? response.user_message_id : null;
+
+  const skillCalls: DebugSkillCall[] = [];
+  if (Array.isArray(response.skill_calls)) {
+    response.skill_calls.forEach((item) => {
+      if (isRecord(item) && typeof item.skill_name === 'string') {
+        skillCalls.push({
+          skill_name: item.skill_name,
+          reason: typeof item.reason === 'string' ? item.reason : null,
+          confidence: toNumber(item.confidence),
+          status: typeof item.status === 'string' ? item.status : null,
+          skipped: item.skipped === true,
+        });
+      }
+    });
+  }
+
+  const completedGoals: DebugCompletedGoal[] = [];
+  if (Array.isArray(response.completed_goals)) {
+    response.completed_goals.forEach((item) => {
+      if (isRecord(item) && typeof item.goal_id === 'string') {
+        completedGoals.push({
+          goal_id: item.goal_id,
+          goal_name: typeof item.goal_name === 'string' ? item.goal_name : null,
+          reason: typeof item.reason === 'string' ? item.reason : null,
+        });
+      }
+    });
+  }
+
   return {
     reasoningFlow: formatReasoningFlow(reasoningPieces.join('\n\n')),
     intentScores: dedupedIntentScores.sort((a, b) => b.percent - a.percent),
@@ -208,6 +261,10 @@ const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
     policies,
     tokenInput,
     tokenOutput,
+    answerReason,
+    skillCalls,
+    completedGoals,
+    userMessageId,
   };
 };
 
@@ -250,9 +307,14 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
     await sendMessage('alo');
   };
 
-  const handleClearConversation = () => {
-    clearChat();
-    setShowClearConfirm(false);
+  const handleClearConversation = async () => {
+    try {
+      await clearChat();
+      setShowClearConfirm(false);
+    } catch (err) {
+      // Error đã được xử lý trong hook, chỉ cần giữ modal mở
+      console.error('Failed to clear chat:', err);
+    }
   };
 
   return (
@@ -446,6 +508,61 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
                     </div>
                   </div>
                 </div>
+
+                {debugData.skillCalls.length > 0 && (
+                  <div className="sim-debug-section">
+                    <h4>Skill đã gọi</h4>
+                    <div className="sim-debug-list">
+                      {debugData.skillCalls.map((skill, idx) => (
+                        <div key={idx} style={{ marginBottom: '12px', padding: '8px', background: '#f5f5f5', borderRadius: '4px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <strong>{skill.skill_name}</strong>
+                            {skill.skipped && <span style={{ color: '#999', fontSize: '12px' }}>(bỏ qua)</span>}
+                            {skill.status && <span className="sim-policy-pill" style={{ fontSize: '11px' }}>{skill.status}</span>}
+                          </div>
+                          {skill.reason && <p style={{ fontSize: '13px', margin: '4px 0 0 0' }}>{skill.reason}</p>}
+                          {skill.confidence !== null && (
+                            <p style={{ fontSize: '12px', color: '#666', margin: '4px 0 0 0' }}>
+                              Độ tin cậy: {skill.confidence}%
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {debugData.completedGoals.length > 0 && (
+                  <div className="sim-debug-section">
+                    <h4>Goal đã hoàn thành</h4>
+                    <div className="sim-debug-list">
+                      {debugData.completedGoals.map((goal, idx) => (
+                        <div key={idx} style={{ marginBottom: '12px', padding: '8px', background: '#f0f9ff', borderRadius: '4px', borderLeft: '3px solid #3b82f6' }}>
+                          <div style={{ marginBottom: '4px' }}>
+                            <strong>{goal.goal_name || goal.goal_id}</strong>
+                          </div>
+                          {goal.goal_name && goal.goal_id !== goal.goal_name && (
+                            <p style={{ fontSize: '12px', color: '#666', margin: '2px 0' }}>ID: {goal.goal_id}</p>
+                          )}
+                          {goal.reason && <p style={{ fontSize: '13px', margin: '4px 0 0 0' }}>{goal.reason}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {debugData.answerReason && (
+                  <div className="sim-debug-section">
+                    <h4>Lý do trả lời</h4>
+                    <div className="sim-debug-box">
+                      {debugData.answerReason}
+                    </div>
+                  </div>
+                )}
+
+                {debugData.userMessageId && (
+                  <div className="sim-debug-meta">user_message_id: {debugData.userMessageId}</div>
+                )}
 
                 {latestResponse?.message_id && (
                   <div className="sim-debug-meta">message_id: {latestResponse.message_id}</div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { chatWithBot } from '../../services/admin/chatService';
+import { chatWithBot, resetChatSession } from '../../services/admin/chatService';
 import type { ChatMessageItem, ChatResponsePayload } from '../../types';
 
 interface UseChatSimulatorParams {
@@ -90,11 +90,27 @@ export const useChatSimulator = ({ botId, brandId }: UseChatSimulatorParams) => 
     window.localStorage.setItem(storageKey, JSON.stringify(dataToSave));
   }, [messages, latestResponse, storageKey]);
 
-  const clearChat = useCallback(() => {
-    setMessages([]);
-    setLatestResponse(null);
-    setError('');
-  }, []);
+  const clearChat = useCallback(async () => {
+    if (!botId) {
+      setError('Thiếu bot_id để xóa session');
+      return;
+    }
+
+    try {
+      await resetChatSession({
+        user_id: `simulator-${botId}`,
+        bot_id: botId,
+      });
+
+      setMessages([]);
+      setLatestResponse(null);
+      setError('');
+    } catch (err) {
+      const message = normalizeErrorMessage(err);
+      setError(`Không thể xóa session: ${message}`);
+      throw err;
+    }
+  }, [botId]);
 
   const sendMessage = useCallback(
     async (text: string) => {

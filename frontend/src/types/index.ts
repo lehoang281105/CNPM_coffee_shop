@@ -271,3 +271,9 @@ export interface FeedbackSavePayload {
 export interface FeedbackReportDevPayload {
   note: string;
 }
+
+// ─── Chat Reset ──────────────────────────────────────────────────────────────
+export interface ResetSessionPayload {
+  user_id: string;
+  bot_id: string;
+}
