@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import NotificationModal from '../../../../../components/common/NotificationModal';
-import { useGoals } from '../../../../../hooks/admin/useGoals';
-import type { Goal } from '../../../../../types';
+import NotificationModal from '../../../../../../components/common/NotificationModal';
+import { useGoals } from '../../../../../../hooks/admin/useGoals';
+import type { Goal } from '../../../../../../types';
 import GoalReplyModal from './GoalReplyModal';
 import GoalScriptModal from './GoalScriptModal';
 import {
@@ -9,8 +9,8 @@ import {
   makeGoalNameFromScript,
   parseGoalRule,
   type ReplySample,
-} from '../../../../../utils/goalHelpers';
-import { parseIntentMeta } from '../../../../../utils/intentHelpers';
+} from '../../../../../../utils/goalHelpers';
+import { parseIntentMeta } from '../../../../../../utils/intentHelpers';
 
 interface GoalsProps {
   botId?: string;

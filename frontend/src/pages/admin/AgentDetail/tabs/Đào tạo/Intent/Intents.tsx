@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import NotificationModal from '../../../../../components/common/NotificationModal';
-import { useIntents } from '../../../../../hooks/admin/useIntents';
-import type { Intent, IntentCreatePayload, IntentUpdatePayload } from '../../../../../types';
+import NotificationModal from '../../../../../../components/common/NotificationModal';
+import { useIntents } from '../../../../../../hooks/admin/useIntents';
+import type { Intent, IntentCreatePayload, IntentUpdatePayload } from '../../../../../../types';
 import IntentModal from './IntentModal';
-import { parseIntentMeta } from '../../../../../utils/intentHelpers';
+import { parseIntentMeta } from '../../../../../../utils/intentHelpers';
 
 interface IntentsProps {
   botId?: string;

@@ -4,12 +4,12 @@ import type {
   Intent,
   IntentCreatePayload,
   IntentUpdatePayload,
-} from '../../../../../types';
+} from '../../../../../../types';
 import {
   buildIntentExamplePayload,
   parseIntentMeta,
   toDisplayNameFromMachine,
-} from '../../../../../utils/intentHelpers';
+} from '../../../../../../utils/intentHelpers';
 
 interface IntentModalProps {
   mode: 'create' | 'edit';

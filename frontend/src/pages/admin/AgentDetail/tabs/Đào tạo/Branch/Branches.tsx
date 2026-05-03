@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import CreateBranchModal from '../../../../../components/admin/CreateBranchModal';
-import NotificationModal from '../../../../../components/common/NotificationModal';
-import { useBranches } from '../../../../../hooks/admin/useBranches';
+import CreateBranchModal from '../../../../../../components/admin/CreateBranchModal';
+import NotificationModal from '../../../../../../components/common/NotificationModal';
+import { useBranches } from '../../../../../../hooks/admin/useBranches';
 import type {
   Branch,
   BranchCreatePayload,
   BranchUpdatePayload,
-} from '../../../../../types';
+} from '../../../../../../types';
 
 interface BranchesProps {
   brandId?: string | null;

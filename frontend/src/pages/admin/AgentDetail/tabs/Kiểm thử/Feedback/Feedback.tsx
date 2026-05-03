@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import NotificationModal from '../../../../../components/common/NotificationModal';
-import { useFeedback } from '../../../../../hooks/admin/useFeedback';
-import type { Feedback as FeedbackType } from '../../../../../types';
-import './FAQ.css';
+import NotificationModal from '../../../../../../components/common/NotificationModal';
+import { useFeedback } from '../../../../../../hooks/admin/useFeedback';
+import type { Feedback as FeedbackType } from '../../../../../../types';
+import '../../Đào tạo/FAQ/FAQ.css';
 
 const PAGE_SIZE = 8;
 

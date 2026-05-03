@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import FAQUpsertModal from '../../../../../components/admin/FAQUpsertModal';
-import NotificationModal from '../../../../../components/common/NotificationModal';
-import { useFAQ } from '../../../../../hooks/admin/useFAQ';
-import type { FAQ as FAQType, FAQCreatePayload, FAQUpdatePayload } from '../../../../../types';
+import FAQUpsertModal from '../../../../../../components/admin/FAQUpsertModal';
+import NotificationModal from '../../../../../../components/common/NotificationModal';
+import { useFAQ } from '../../../../../../hooks/admin/useFAQ';
+import type { FAQ as FAQType, FAQCreatePayload, FAQUpdatePayload } from '../../../../../../types';
 import './FAQ.css';
 
 const PAGE_SIZE = 8;

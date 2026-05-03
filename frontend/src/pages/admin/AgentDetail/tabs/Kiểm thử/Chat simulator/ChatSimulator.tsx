@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useChatSimulator } from '../../../../../hooks/admin/useChatSimulator';
-import type { ChatResponsePayload } from '../../../../../types';
+import { useChatSimulator } from '../../../../../../hooks/admin/useChatSimulator';
+import type { ChatResponsePayload } from '../../../../../../types';
 
 interface ChatSimulatorProps {
   botId?: string;
