@@ -7,6 +7,8 @@ interface AgentLayoutProps {
   bot?: Bot | null;
   brand?: Brand | null;
   loading?: boolean;
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
   activeMenuId?: string;
   onMenuSelect?: (menuId: string) => void;
 }
@@ -50,14 +52,7 @@ function getInitials(name: string) {
   return name.split(/[\s—–\-]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 }
 
-const AgentLayout: React.FC<AgentLayoutProps> = ({
-  children,
-  bot,
-  brand,
-  loading,
-  activeMenuId = 'general',
-  onMenuSelect,
-}) => {
+const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading, activeTab = 'general', onTabChange }) => {
   const navigate = useNavigate();
 
   const botName = bot?.name || 'Loading...';
@@ -94,8 +89,8 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({
               {group.items.map(item => (
                 <button
                   key={item.id}
-                  className={`sidebar-nav-item ${item.id === activeMenuId ? 'active' : ''}`}
-                  onClick={() => onMenuSelect?.(item.id)}
+                  onClick={() => onTabChange && onTabChange(item.id)}
+                  className={`sidebar-nav-item ${item.id === activeTab ? 'active' : ''}`}
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
                 </button>

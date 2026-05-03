@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
+import KnowledgeTab from './tabs/Tri thức';
+import SkillsTab from './tabs/Skills';
 import Branches from './tabs/Đào tạo/Branch/Branches';
 import Intents from './tabs/Đào tạo/Intent/Intents';
 import Goals from './tabs/Đào tạo/Goal/Goals';
@@ -14,7 +16,7 @@ import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills'>('skills');
 
   const {
     bot,
@@ -34,30 +36,35 @@ const AgentDetailPage: React.FC = () => {
   return (
     <>
       <AgentLayout
-        bot={bot}
-        brand={brand}
-        loading={loading}
-        activeMenuId={activeTab}
-        onMenuSelect={handleMenuSelect}
-      >
+  bot={bot}
+  brand={brand}
+  loading={loading}
+  activeTab={activeTab}         // Giữ lại cái này từ nhánh của bạn
+  onTabChange={setActiveTab}    // Giữ lại cái này từ nhánh của bạn
+  activeMenuId={activeTab}      // Props mới từ main
+  onMenuSelect={handleMenuSelect} // Props mới từ main
+/>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
           <>
-            {activeTab === 'simulator' ? (
-              <ChatSimulator botId={bot.id} botName={bot.name} brandId={brand?.id || bot.brand_id} onSwitchToFeedback={() => setActiveTab('feedback')} />
-            ) : activeTab === 'intent' ? (
-              <Intents botId={bot.id} />
-            ) : activeTab === 'goals' ? (
-              <Goals botId={bot.id} />
-            ) : activeTab === 'faq' ? (
-              <FAQ botId={bot.id} />
-            ) : activeTab === 'feedback' ? (
-              <Feedback botId={bot.id} />
-            ) : activeTab === 'general' ? (
-              <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
-            ) : (
-              <Branches brandId={bot.brand_id} />
+{activeTab === 'simulator' ? (
+  <ChatSimulator botId={bot.id} ... />
+) : activeTab === 'intent' ? (
+  <Intents botId={bot.id} />
+) : activeTab === 'goals' ? (
+  <Goals botId={bot.id} />
+) : activeTab === 'skills' ? (  // Chèn thêm đoạn này của bạn vào đây
+  <SkillsTab brandId={brand?.id} />
+) : activeTab === 'faq' ? (
+  <FAQ botId={bot.id} />
+) : activeTab === 'feedback' ? (
+  <Feedback botId={bot.id} />
+) : activeTab === 'general' ? (
+  <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
+) : (
+  <Branches brandId={bot.brand_id} />
+)}
             )}
           </>
         ) : (
