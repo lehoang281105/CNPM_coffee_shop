@@ -1,4 +1,4 @@
-import type { Intent } from '../../../../../types';
+import type { Intent } from '../types';
 
 export interface IntentUiMeta {
   displayName: string;
