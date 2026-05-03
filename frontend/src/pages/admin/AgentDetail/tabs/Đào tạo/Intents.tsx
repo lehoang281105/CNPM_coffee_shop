@@ -108,14 +108,14 @@ const Intents: React.FC<IntentsProps> = ({ botId }) => {
     if (!modalState) return;
     try {
       if (modalState.mode === 'edit' && modalState.intent) {
-        await updateIntentItem(modalState.intent.id, payload);
+        await updateIntentItem(modalState.intent.id, payload as IntentUpdatePayload);
         setNotification({
           title: 'Thành công',
           message: 'Đã cập nhật intent.',
           type: 'success',
         });
       } else {
-        await createIntentItem(payload);
+        await createIntentItem(payload as IntentCreatePayload);
         setNotification({
           title: 'Thành công',
           message: 'Đã tạo intent mới.',
