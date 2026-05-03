@@ -17,7 +17,7 @@ import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'>('general');
 
   const {
     bot,
@@ -29,18 +29,10 @@ const AgentDetailPage: React.FC = () => {
   } = useAgentDetail(id);
 
 
-  const renderTabContent = () => {
-    if (!bot) return null;
-    switch (activeTab) {
-      case 'general':
-        return <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />;
-      case 'services':
-        return <ServiceTab botId={bot.id} brandId={brand?.id} />;
-      default:
-        return <div style={{ padding: 40, textAlign: 'center' }}>Tính năng đang phát triển</div>;
+
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback') {
+    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback' || menuId === 'skills' || menuId === 'services' ) {
       setActiveTab(menuId as any);
 
     }
@@ -48,19 +40,6 @@ const AgentDetailPage: React.FC = () => {
 
   return (
     <>
-
-      <AgentLayout
-        bot={bot}
-        brand={brand}
-        loading={loading}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      >
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
-        ) : bot ? (
-          renderTabContent()
-
       <AgentLayout
         bot={bot}
         brand={brand}
@@ -86,6 +65,8 @@ const AgentDetailPage: React.FC = () => {
               <FAQ botId={bot.id} />
             ) : activeTab === 'feedback' ? (
               <Feedback botId={bot.id} />
+            ) : activeTab === 'services' ? (
+              <ServiceTab botId={bot.id} />
             ) : activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : (
