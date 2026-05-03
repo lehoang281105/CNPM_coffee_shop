@@ -22,9 +22,8 @@ const MENU_GROUPS = [
       { id: 'intent', label: 'Ý định', icon: 'ti-target' },
       { id: 'goals', label: 'Mục tiêu', icon: 'ti-flag' },
       { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
-      { id: 'skills', label: 'Skills', icon: 'ti-bolt' },
+      { id: 'skills', label: 'Kỹ năng', icon: 'ti-bolt' },
       { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
-      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
       { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
       { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
     ]
@@ -33,6 +32,7 @@ const MENU_GROUPS = [
     title: 'KIỂM THỬ',
     items: [
       { id: 'simulator', label: 'Chat Simulator', icon: 'ti-headphone-alt' },
+      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
     ]
   },
   {
@@ -91,12 +91,8 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
                 <button
                   key={item.id}
 
-                  className={`sidebar-nav-item ${activeTab === item.id ? 'active' : ''}`}
-                  onClick={() => onTabChange && onTabChange(item.id)}
-
-                  onClick={() => onTabChange && onTabChange(item.id)}
                   className={`sidebar-nav-item ${item.id === activeTab ? 'active' : ''}`}
-
+                  onClick={() => onTabChange && onTabChange(item.id)}
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
                 </button>

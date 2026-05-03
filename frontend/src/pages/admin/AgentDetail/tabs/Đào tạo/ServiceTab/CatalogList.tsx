@@ -14,6 +14,7 @@ interface CatalogListProps {
 const CatalogList: React.FC<CatalogListProps> = ({ brandId }) => {
   const [catalogs, setCatalogs] = useState<ServiceCatalog[]>([]);
   const [brandsMap, setBrandsMap] = useState<Record<string, string>>({});
+  const [currentBrandName, setCurrentBrandName] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [catalogToEdit, setCatalogToEdit] = useState<ServiceCatalog | null>(null);
@@ -28,13 +29,15 @@ const CatalogList: React.FC<CatalogListProps> = ({ brandId }) => {
     setLoading(true);
     try {
       const [catalogRes, brandRes] = await Promise.all([
-        catalogService.getCatalogs(),
+        catalogService.getAllCatalogs(),
         brandService.getAllBrands(),
       ]);
       const brands = brandRes.data || [];
       const map: Record<string, string> = {};
       brands.forEach((b: Brand) => (map[b.id] = b.name));
       setBrandsMap(map);
+      // Cập nhật tên thương hiệu hiện tại
+      if (brandId) setCurrentBrandName(map[brandId] || brandId);
       const data = catalogRes.data || [];
       setCatalogs(brandId ? data.filter(c => c.brand_id === brandId) : data);
     } catch (err) {
@@ -182,8 +185,12 @@ const CatalogList: React.FC<CatalogListProps> = ({ brandId }) => {
         <CreateCatalogModal
           onClose={handleCloseModal}
           onSuccess={handleSuccess}
-          brandId={brandId}
-          brandName={brandsMap[brandId || ''] || brandId}
+          brandId={catalogToEdit ? catalogToEdit.brand_id : brandId}
+          brandName={
+            catalogToEdit
+              ? (brandsMap[catalogToEdit.brand_id] || catalogToEdit.brand_id)
+              : (currentBrandName || brandId)
+          }
           catalogToEdit={catalogToEdit}
         />
       )}

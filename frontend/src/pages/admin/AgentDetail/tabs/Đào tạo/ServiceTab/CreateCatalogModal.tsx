@@ -24,6 +24,7 @@ const CreateCatalogModal: React.FC<CreateCatalogModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const selectedBrandId = catalogToEdit?.brand_id || brandId || '';
+  // brandName prop đã được resolve từ brandsMap bên ngoài, dùng trực tiếp
   const displayBrandName = brandName || selectedBrandId;
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Bot, Brand } from '../../../../../types';
+import type { Bot, Brand } from '../../../../../../types';
 
 const TONES = [
   { id: 'professional', left: 'Trang trọng', right: 'Thoải mái', defaultValue: 80, badge: 'Professional' },
@@ -80,8 +80,8 @@ const GeneralConfig: React.FC<GeneralConfigProps> = ({ bot, brand, onSave }) => 
             </div>
             <div className="form-group">
               <label className="form-label">Mô tả</label>
-              <textarea 
-                className="form-textarea" 
+              <textarea
+                className="form-textarea"
                 value={rolePrompt}
                 onChange={e => setRolePrompt(e.target.value)}
               />
@@ -111,10 +111,10 @@ const GeneralConfig: React.FC<GeneralConfigProps> = ({ bot, brand, onSave }) => 
                 <div className="tone-slider-wrap" style={{ position: 'relative' }}>
                   <div className="tone-slider-track" />
                   <div className="tone-slider-thumb" style={{ left: `${tone.value}%` }} />
-                  <input 
-                    type="range" 
-                    min="0" max="100" 
-                    value={tone.value} 
+                  <input
+                    type="range"
+                    min="0" max="100"
+                    value={tone.value}
                     onChange={e => handleToneChange(tone.id, parseInt(e.target.value))}
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                   />

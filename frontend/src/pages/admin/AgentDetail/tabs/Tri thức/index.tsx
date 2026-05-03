@@ -16,7 +16,6 @@ interface KnowledgeTabProps {
 
 const KnowledgeTab: React.FC<KnowledgeTabProps> = ({ bot, brandId }) => {
   const { id: agentId } = useParams<{ id: string }>();
-  
   const {
     documents,
     faqs,
