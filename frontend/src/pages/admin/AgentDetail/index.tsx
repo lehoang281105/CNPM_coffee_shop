@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
 import KnowledgeTab from './tabs/Tri thức';
 import SkillsTab from './tabs/Skills';
+import Branches from './tabs/Đào tạo/Branch/Branches';
+import Intents from './tabs/Đào tạo/Intent/Intents';
+import Goals from './tabs/Đào tạo/Goal/Goals';
+import FAQ from './tabs/Đào tạo/FAQ/FAQ';
+import Feedback from './tabs/Kiểm thử/Feedback/Feedback';
+import ChatSimulator from './tabs/Kiểm thử/Chat simulator/ChatSimulator';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = React.useState('skills'); // default to skills to test
-  
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills'>('skills');
+
   const {
     bot,
     brand,
@@ -21,18 +27,44 @@ const AgentDetailPage: React.FC = () => {
     handleSaveConfig,
   } = useAgentDetail(id);
 
+  const handleMenuSelect = (menuId: string) => {
+    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback') {
+      setActiveTab(menuId as any);
+    }
+  };
+
   return (
     <>
-      <AgentLayout bot={bot} brand={brand} loading={loading} activeTab={activeTab} onTabChange={setActiveTab}>
+      <AgentLayout
+  bot={bot}
+  brand={brand}
+  loading={loading}
+  activeTab={activeTab}         // Giữ lại cái này từ nhánh của bạn
+  onTabChange={setActiveTab}    // Giữ lại cái này từ nhánh của bạn
+  activeMenuId={activeTab}      // Props mới từ main
+  onMenuSelect={handleMenuSelect} // Props mới từ main
+/>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
           <>
-            {activeTab === 'general' && <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />}
-            {activeTab === 'knowledge' && <KnowledgeTab bot={id} brandId={brand?.id} />}
-            {activeTab === 'skills' && <SkillsTab brandId={brand?.id} />}
-            {activeTab !== 'general' && activeTab !== 'knowledge' && activeTab !== 'skills' && (
-               <div style={{ padding: 40, textAlign: 'center', color: '#666' }}>Tính năng đang phát triển...</div>
+{activeTab === 'simulator' ? (
+  <ChatSimulator botId={bot.id} ... />
+) : activeTab === 'intent' ? (
+  <Intents botId={bot.id} />
+) : activeTab === 'goals' ? (
+  <Goals botId={bot.id} />
+) : activeTab === 'skills' ? (  // Chèn thêm đoạn này của bạn vào đây
+  <SkillsTab brandId={brand?.id} />
+) : activeTab === 'faq' ? (
+  <FAQ botId={bot.id} />
+) : activeTab === 'feedback' ? (
+  <Feedback botId={bot.id} />
+) : activeTab === 'general' ? (
+  <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
+) : (
+  <Branches brandId={bot.brand_id} />
+)}
             )}
           </>
         ) : (

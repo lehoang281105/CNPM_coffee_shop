@@ -66,6 +66,11 @@
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+.nav-btn--active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
 .nav-btn--icon {
   padding: 0;
   width: 36px; height: 36px;
