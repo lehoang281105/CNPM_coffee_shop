@@ -9,7 +9,7 @@ export const useSkills = (botId?: string, brandId?: string) => {
   const [error, setError] = useState<string | null>(null);
   const [activatingTemplateId, setActivatingTemplateId] = useState<string | null>(null);
 
-  const fetchSkills = useCallback(async () => {
+  const fetchSkills = useCallback(async (isBackground = false) => {
     if (!botId) {
       setCustomSkills([]);
       setLoading(false);
@@ -17,17 +17,22 @@ export const useSkills = (botId?: string, brandId?: string) => {
     }
 
     try {
-      setCustomSkills([]);
-      setLoading(true);
+      if (!isBackground) {
+        setLoading(true);
+      }
       setError(null);
       const res = await getSkills({ bot_id: botId });
       setCustomSkills(res.data || []);
     } catch (err) {
       console.error('Error fetching skills:', err);
       setError('Không thể tải danh sách Skill. Vui lòng kiểm tra kết nối.');
-      setCustomSkills([]);
+      if (!isBackground) {
+        setCustomSkills([]);
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [botId]);
 
@@ -49,7 +54,7 @@ export const useSkills = (botId?: string, brandId?: string) => {
         is_active: true,
         brand_id: brandId || ""
       });
-      await fetchSkills();
+      await fetchSkills(true);
     } catch (err) {
       console.error('Error activating template:', err);
       alert('Có lỗi xảy ra khi kích hoạt template.');
@@ -64,7 +69,7 @@ export const useSkills = (botId?: string, brandId?: string) => {
       if (skillToDeactivate) {
         setActivatingTemplateId(template.id);
         await deleteSkill(skillToDeactivate.id);
-        await fetchSkills();
+        await fetchSkills(true);
       }
     } catch (err) {
       console.error('Error deactivating template:', err);
@@ -78,7 +83,7 @@ export const useSkills = (botId?: string, brandId?: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa Skill này không?')) {
       try {
         await deleteSkill(skillId);
-        await fetchSkills();
+        await fetchSkills(true);
       } catch (err) {
         console.error('Error deleting skill:', err);
         alert('Có lỗi xảy ra khi xóa Skill.');
@@ -90,7 +95,7 @@ export const useSkills = (botId?: string, brandId?: string) => {
     customSkills,
     loading,
     error,
-    refetch: fetchSkills,
+    refetch: () => fetchSkills(true),
     activatingTemplateId,
     activateTemplate,
     deactivateTemplate,
