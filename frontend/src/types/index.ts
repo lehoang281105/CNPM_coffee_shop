@@ -57,6 +57,50 @@ export interface BrandCreatePayload {
   status?: string;
 }
 
+
+// ─── Service Catalog ─────────────────────────────────────────────────────────
+export interface ServiceCatalog {
+  id: string;
+  category_name: string;
+  brand_id: string;
+  service_ids: string[];
+  description?: string;
+  created_at: number;
+  updated_at: number;
+}
+
+// ─── Service ─────────────────────────────────────────────────────────────────
+export interface ServiceMetadata {
+  service_code?: string;
+  slug?: string;
+  duration?: number;
+  image_url?: string;
+  tags?: string[];
+  general_price?: number;
+  conditional_prices?: any[];
+  catalog_id?: string;
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  description: string;
+  status: 'active' | 'inactive';
+  brand_id: string;
+  branch_id?: string;
+  service_metadata?: ServiceMetadata;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface ServiceCreatePayload {
+  name: string;
+  description?: string;
+  status: 'active' | 'inactive';
+  brand_id: string;
+  branch_id?: string;
+  service_metadata?: ServiceMetadata;
+
 // ─── Knowledge ──────────────────────────────────────────────────────────────
 export interface KnowledgeDocument {
   id: string;
@@ -343,4 +387,5 @@ export interface FeedbackReportDevPayload {
 export interface ResetSessionPayload {
   user_id: string;
   bot_id: string;
+
 }

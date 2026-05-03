@@ -9,6 +9,7 @@ interface AgentLayoutProps {
   loading?: boolean;
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
+
   activeMenuId?: string;
   onMenuSelect?: (menuId: string) => void;
 }
@@ -89,8 +90,13 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
               {group.items.map(item => (
                 <button
                   key={item.id}
+
+                  className={`sidebar-nav-item ${activeTab === item.id ? 'active' : ''}`}
+                  onClick={() => onTabChange && onTabChange(item.id)}
+
                   onClick={() => onTabChange && onTabChange(item.id)}
                   className={`sidebar-nav-item ${item.id === activeTab ? 'active' : ''}`}
+
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
                 </button>
