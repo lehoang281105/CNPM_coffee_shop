@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
+import ServiceTab from './tabs/Đào tạo/ServiceTab';
 import KnowledgeTab from './tabs/Tri thức';
 import SkillsTab from './tabs/Skills';
 import Branches from './tabs/Đào tạo/Branch/Branches';
@@ -16,7 +17,8 @@ import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills'>('skills');
+  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills'>('general');
 
   const {
     bot,
@@ -27,14 +29,39 @@ const AgentDetailPage: React.FC = () => {
     handleSaveConfig,
   } = useAgentDetail(id);
 
+
+  const renderTabContent = () => {
+    if (!bot) return null;
+    switch (activeTab) {
+      case 'general':
+        return <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />;
+      case 'services':
+        return <ServiceTab botId={bot.id} brandId={brand?.id} />;
+      default:
+        return <div style={{ padding: 40, textAlign: 'center' }}>Tính năng đang phát triển</div>;
+
   const handleMenuSelect = (menuId: string) => {
     if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback') {
       setActiveTab(menuId as any);
+
     }
   };
 
   return (
     <>
+
+      <AgentLayout 
+        bot={bot} 
+        brand={brand} 
+        loading={loading}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      >
+        {loading ? (
+          <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
+        ) : bot ? (
+          renderTabContent()
+
       <AgentLayout
   bot={bot}
   brand={brand}
