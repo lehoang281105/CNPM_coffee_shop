@@ -1,4 +1,4 @@
-import type { Goal } from '../../../../../types';
+import type { Goal } from '../types';
 
 export interface ReplySample {
   user: string;

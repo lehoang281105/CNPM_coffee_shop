@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ReplySample } from './goalHelpers';
+import type { ReplySample } from '../../../../../utils/goalHelpers';
 
 interface GoalReplyModalProps {
   loading?: boolean;

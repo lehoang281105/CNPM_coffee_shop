@@ -9,8 +9,8 @@ import {
   makeGoalNameFromScript,
   parseGoalRule,
   type ReplySample,
-} from './goalHelpers';
-import { parseIntentMeta } from './intentHelpers';
+} from '../../../../../utils/goalHelpers';
+import { parseIntentMeta } from '../../../../../utils/intentHelpers';
 
 interface GoalsProps {
   botId?: string;

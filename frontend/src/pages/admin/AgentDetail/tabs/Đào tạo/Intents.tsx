@@ -3,7 +3,7 @@ import NotificationModal from '../../../../../components/common/NotificationModa
 import { useIntents } from '../../../../../hooks/admin/useIntents';
 import type { Intent, IntentCreatePayload, IntentUpdatePayload } from '../../../../../types';
 import IntentModal from './IntentModal';
-import { parseIntentMeta } from './intentHelpers';
+import { parseIntentMeta } from '../../../../../utils/intentHelpers';
 
 interface IntentsProps {
   botId?: string;

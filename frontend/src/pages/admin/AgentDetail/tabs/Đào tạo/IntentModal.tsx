@@ -9,7 +9,7 @@ import {
   buildIntentExamplePayload,
   parseIntentMeta,
   toDisplayNameFromMachine,
-} from './intentHelpers';
+} from '../../../../../utils/intentHelpers';
 
 interface IntentModalProps {
   mode: 'create' | 'edit';
