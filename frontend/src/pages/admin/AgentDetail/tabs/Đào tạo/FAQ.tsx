@@ -55,7 +55,19 @@ export default function FAQ({ botId }: FAQProps) {
   };
 
   // Handlers
-  const openCreate = () => { setEditFAQ(null); setShowModal(true); };
+  const openCreate = () => {
+    if (!botId) {
+      setNotification({
+        title: 'Lỗi',
+        message: 'Không xác định được Bot hiện tại. Vui lòng thử lại.',
+        type: 'error'
+      });
+      return;
+    }
+    setEditFAQ(null);
+    setShowModal(true);
+  };
+  
   const openEdit = (faq: FAQType) => { setEditFAQ(faq); setShowModal(true); };
   const closeModal = () => { setShowModal(false); setEditFAQ(null); };
 
@@ -321,10 +333,10 @@ export default function FAQ({ botId }: FAQProps) {
         </div>
 
       {/* Create/Edit Modal */}
-      {showModal && (
+      {showModal && botId && (
         <FAQUpsertModal
           faq={editFAQ}
-          bots={bots}
+          botId={botId}
           onClose={closeModal}
           onSubmit={onSubmit}
         />

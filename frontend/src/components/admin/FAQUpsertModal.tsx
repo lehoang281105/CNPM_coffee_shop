@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import type { FAQ, FAQCreatePayload, FAQUpdatePayload, Bot } from '../../types';
+import type { FAQ, FAQCreatePayload, FAQUpdatePayload } from '../../types';
 
 interface FAQUpsertModalProps {
   faq?: FAQ | null;
-  bots: Bot[];
+  botId: string; // Bot ID hiện tại, không cho phép thay đổi
   onClose: () => void;
   onSubmit: (payload: FAQCreatePayload | FAQUpdatePayload) => Promise<void>;
 }
 
-const FAQUpsertModal: React.FC<FAQUpsertModalProps> = ({ faq, bots, onClose, onSubmit }) => {
+const FAQUpsertModal: React.FC<FAQUpsertModalProps> = ({ faq, botId, onClose, onSubmit }) => {
   const isEdit = !!faq;
   const [question, setQuestion] = useState(faq?.question ?? '');
   const [answer, setAnswer] = useState(faq?.answer ?? '');
-  const [botId, setBotId] = useState(faq?.bot_id ?? (bots[0]?.id ?? ''));
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -20,7 +19,6 @@ const FAQUpsertModal: React.FC<FAQUpsertModalProps> = ({ faq, bots, onClose, onS
     if (faq) {
       setQuestion(faq.question);
       setAnswer(faq.answer);
-      setBotId(faq.bot_id);
     }
   }, [faq]);
 
@@ -28,7 +26,6 @@ const FAQUpsertModal: React.FC<FAQUpsertModalProps> = ({ faq, bots, onClose, onS
     const errs: Record<string, string> = {};
     if (!question.trim()) errs.question = 'Câu hỏi không được để trống';
     if (!answer.trim()) errs.answer = 'Câu trả lời không được để trống';
-    if (!botId) errs.bot_id = 'Vui lòng chọn Bot';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -64,25 +61,6 @@ const FAQUpsertModal: React.FC<FAQUpsertModalProps> = ({ faq, bots, onClose, onS
 
         {/* Body */}
         <div className="modal-body">
-          {/* Bot select */}
-          <div className="form-group">
-            <label className="form-label">
-              Bot <span className="req">*</span>
-            </label>
-            <select
-              id="faq-bot-select"
-              className={`form-select ${errors.bot_id ? 'form-input--error' : ''}`}
-              value={botId}
-              onChange={(e) => setBotId(e.target.value)}
-            >
-              <option value="">— Chọn Bot —</option>
-              {bots.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-            {errors.bot_id && <span className="form-error">{errors.bot_id}</span>}
-          </div>
-
           {/* Question */}
           <div className="form-group">
             <label className="form-label">
