@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { Bot, Brand } from '../../types';
 
 interface AgentLayoutProps {
@@ -9,6 +9,9 @@ interface AgentLayoutProps {
   loading?: boolean;
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
+
+  activeMenuId?: string;
+  onMenuSelect?: (menuId: string) => void;
 }
 
 const MENU_GROUPS = [
@@ -21,6 +24,7 @@ const MENU_GROUPS = [
       { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
       { id: 'skills', label: 'Skills', icon: 'ti-bolt' },
       { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
+      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
       { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
       { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
     ]
@@ -86,8 +90,13 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
               {group.items.map(item => (
                 <button
                   key={item.id}
+
                   className={`sidebar-nav-item ${activeTab === item.id ? 'active' : ''}`}
                   onClick={() => onTabChange && onTabChange(item.id)}
+
+                  onClick={() => onTabChange && onTabChange(item.id)}
+                  className={`sidebar-nav-item ${item.id === activeTab ? 'active' : ''}`}
+
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
                 </button>
