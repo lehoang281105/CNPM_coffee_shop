@@ -24,14 +24,6 @@ const Header: React.FC<HeaderProps> = ({ onCreateBrand, onCreateBot, onOpenHelp 
 
       {/* Navigation */}
       <nav className="header-nav">
-        {/* Dashboard */}
-        <Link
-          to="/"
-          className={`nav-btn ${location.pathname === '/' ? 'nav-btn--active' : ''}`}
-        >
-          <i className="ti-dashboard" />
-          Dashboard
-        </Link>
 
         {/* Help icon-only */}
         <button id="btn-help" className="nav-btn nav-btn--icon" title="Trợ giúp" onClick={onOpenHelp}>

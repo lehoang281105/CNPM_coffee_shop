@@ -15,6 +15,22 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+// ─── Working Hours ──────────────────────────────────────────────────────────
+export interface WorkingHoursDay {
+  start: string;  // "HH:mm"
+  end: string;    // "HH:mm"
+}
+
+export type WorkingHours = {
+  [key in 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday']?: WorkingHoursDay;
+};
+
+// ─── Nudge Settings ─────────────────────────────────────────────────────────
+export interface NudgeSettings {
+  enabled: boolean;
+  delays: number[];  // giây, VD: [60]
+}
+
 // ─── Bot ────────────────────────────────────────────────────────────────────
 export interface Bot {
   id: string;
@@ -27,6 +43,8 @@ export interface Bot {
   max_tokens: number;
   status: string;   // "active" | "inactive"
   brand_id: string;
+  working_hours?: WorkingHours;
+  nudge_settings?: NudgeSettings;
 }
 
 export interface BotCreatePayload {
@@ -37,6 +55,8 @@ export interface BotCreatePayload {
   max_tokens: number;
   status: string;
   brand_id: string;
+  working_hours?: WorkingHours;
+  nudge_settings?: NudgeSettings;
 }
 
 // ─── Brand ──────────────────────────────────────────────────────────────────
@@ -100,6 +120,7 @@ export interface ServiceCreatePayload {
   brand_id: string;
   branch_id?: string;
   service_metadata?: ServiceMetadata;
+}
 
 // ─── Knowledge ──────────────────────────────────────────────────────────────
 export interface KnowledgeDocument {
@@ -166,6 +187,8 @@ export interface SkillBaseResponse {
   headers: any;
   is_active: boolean;
   brand_id: string;
+}
+
 // ─── Branch ─────────────────────────────────────────────────────────────────
 export interface Branch {
   id: string;
