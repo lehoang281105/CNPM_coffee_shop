@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import type { Bot, Brand } from '../../types';
 
 interface AgentLayoutProps {
@@ -8,10 +8,6 @@ interface AgentLayoutProps {
   brand?: Brand | null;
   loading?: boolean;
   activeTab?: string;
-  onTabChange?: (tabId: string) => void;
-
-  activeMenuId?: string;
-  onMenuSelect?: (menuId: string) => void;
 }
 
 const MENU_GROUPS = [
@@ -22,7 +18,7 @@ const MENU_GROUPS = [
       { id: 'intent', label: 'Ý định', icon: 'ti-target' },
       { id: 'goals', label: 'Mục tiêu', icon: 'ti-flag' },
       { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
-      { id: 'skills', label: 'Kỹ năng', icon: 'ti-bolt' },
+      { id: 'skills', label: 'Skills', icon: 'ti-bolt' },
       { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
       { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
       { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
@@ -32,7 +28,6 @@ const MENU_GROUPS = [
     title: 'KIỂM THỬ',
     items: [
       { id: 'simulator', label: 'Chat Simulator', icon: 'ti-headphone-alt' },
-      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
     ]
   },
   {
@@ -53,8 +48,9 @@ function getInitials(name: string) {
   return name.split(/[\s—–\-]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 }
 
-const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading, activeTab = 'general', onTabChange }) => {
+const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading, activeTab = 'general' }) => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
 
   const botName = bot?.name || 'Loading...';
   const brandName = brand?.name ? ` — ${brand.name}` : '';
@@ -88,14 +84,13 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
             <div key={group.title || index} className="sidebar-group">
               {group.title && <span className="sidebar-group-title">{group.title}</span>}
               {group.items.map(item => (
-                <button
+                <NavLink
                   key={item.id}
-
+                  to={id ? `/agents/${id}?tab=${item.id}` : '#'}
                   className={`sidebar-nav-item ${item.id === activeTab ? 'active' : ''}`}
-                  onClick={() => onTabChange && onTabChange(item.id)}
                 >
                   <span style={{ width: 20 }}><i className={item.icon}></i></span> {item.label}
-                </button>
+                </NavLink>
               ))}
             </div>
           ))}

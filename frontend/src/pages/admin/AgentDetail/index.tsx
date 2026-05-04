@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
-import GeneralConfig from './tabs/Đào tạo/General/GeneralConfig';
-import ServiceTab from './tabs/Đào tạo/ServiceTab';
-import KnowledgeTab from './tabs/Tri thức';
-import SkillsTab from './tabs/Skills';
-import Branches from './tabs/Đào tạo/Branch/Branches';
-import Intents from './tabs/Đào tạo/Intent/Intents';
-import Goals from './tabs/Đào tạo/Goal/Goals';
-import FAQ from './tabs/Đào tạo/FAQ/FAQ';
-import Feedback from './tabs/Kiểm thử/Feedback/Feedback';
-import ChatSimulator from './tabs/Kiểm thử/Chat simulator/ChatSimulator';
+import GeneralConfig from './tabs/Đào tạo/GeneralConfig';
+import DeployOverview from './tabs/Triển khai/DeployOverview';
+import DeploymentChannels from './tabs/Triển khai/DeploymentChannels';
+import AudienceTargets from './tabs/Triển khai/AudienceTargets';
+import BehaviorControl from './tabs/Triển khai/BehaviorControl';
+import ForwardingControl from './tabs/Triển khai/ForwardingControl';
+import UiUxConfig from './tabs/Triển khai/UiUxConfig';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'>('general');
-
+  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'general';
   const {
     bot,
     brand,
@@ -28,56 +25,50 @@ const AgentDetailPage: React.FC = () => {
     handleSaveConfig,
   } = useAgentDetail(id);
 
-
-
-
-  const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback' || menuId === 'skills' || menuId === 'services' || menuId === 'knowledge') {
-      setActiveTab(menuId as any);
-
+  const renderTabContent = () => {
+    if (loading) {
+      return <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>;
     }
+
+    if (!bot) {
+      return <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>Không tìm thấy Agent!</div>;
+    }
+
+    if (activeTab === 'general') {
+      return <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />;
+    }
+
+    if (activeTab === 'deploy-overview') {
+      return <DeployOverview />;
+    }
+    if (activeTab === 'channels') {
+      return <DeploymentChannels />;
+    }
+    if (activeTab === 'audience') {
+      return <AudienceTargets />;
+    }
+    if (activeTab === 'behavior') {
+      return <BehaviorControl />;
+    }
+    if (activeTab === 'forwarding') {
+      return <ForwardingControl />;
+    }
+    if (activeTab === 'ui-ux') {
+      return <UiUxConfig />;
+    }
+
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h3 style={{ marginBottom: 8 }}>Tab "{activeTab}"</h3>
+        <p style={{ color: '#666' }}>Mục này đang được phát triển.</p>
+      </div>
+    );
   };
 
   return (
     <>
-      <AgentLayout
-        bot={bot}
-        brand={brand}
-        loading={loading}
-        activeTab={activeTab}
-        onTabChange={(tabId) => setActiveTab(tabId as any)}
-        activeMenuId={activeTab}
-        onMenuSelect={handleMenuSelect}
-      >
-        {loading ? (
-          <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
-        ) : bot ? (
-          <>
-            {activeTab === 'simulator' ? (
-              <ChatSimulator botId={bot.id} botName={bot.name} brandId={bot.brand_id} />
-            ) : activeTab === 'intent' ? (
-              <Intents botId={bot.id} />
-            ) : activeTab === 'goals' ? (
-              <Goals botId={bot.id} />
-            ) : activeTab === 'skills' ? (
-              <SkillsTab brandId={brand?.id} />
-            ) : activeTab === 'faq' ? (
-              <FAQ botId={bot.id} />
-            ) : activeTab === 'feedback' ? (
-              <Feedback botId={bot.id} />
-            ) : activeTab === 'services' ? (
-              <ServiceTab botId={bot.id} brandId={bot.brand_id} />
-            ) : activeTab === 'general' ? (
-              <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
-            ) : activeTab === 'knowledge' ? (
-              <KnowledgeTab bot={bot.id} />
-              ) : (
-              <Branches brandId={bot.brand_id} />
-            )}
-          </>
-        ) : (
-          <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>Không tìm thấy Agent!</div>
-        )}
+      <AgentLayout bot={bot} brand={brand} loading={loading} activeTab={activeTab}>
+        {renderTabContent()}
       </AgentLayout>
 
       {notification && (
