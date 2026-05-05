@@ -412,3 +412,91 @@ export interface ResetSessionPayload {
   bot_id: string;
 
 }
+
+export interface InboxConversationItem {
+  user_id: string;
+  bot_id: string;
+  user_name: string | null;
+  last_message_content: string | null;
+  last_message_time: string | null;
+  is_read: boolean;
+  is_human_takeover: boolean;
+}
+
+export interface InboxMessageItem {
+  id: string;
+  content: string;
+  sender_type: string; // 'user' | 'bot' | 'human' (or similar based on API)
+  created_at: string;
+  is_read: boolean;
+}
+
+export interface UserProfileResponse {
+  user_id: string;
+  bot_id: string;
+  name: string | null;
+  phone: string | null;
+  gender: string | null;
+  description: string | null;
+  language: string | null;
+  extra_data: any;
+}
+
+export interface UserProfileUpdateRequest {
+  name?: string;
+  phone?: string;
+  gender?: string;
+  description?: string;
+  language?: string;
+  extra_data?: any;
+}
+
+export interface InboxTakeoverRequest {
+  user_id: string;
+  bot_id: string;
+}
+
+export interface InboxResolveRequest {
+  user_id: string;
+  bot_id: string;
+}
+
+export interface InboxReplyRequest {
+  user_id: string;
+  bot_id: string;
+  content: string;
+}
+
+// ─── Long Term ──────────────────────────────────────────────────────────────
+export interface LongTermBaseResponse {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  user_id: string;
+  name: string | null;
+  gender: string | null;
+  phone: string | null;
+  description: string | null;
+  language: string | null;
+  bot_id: string;
+}
+
+export interface LongTermCreateRequest {
+  user_id: string;
+  name?: string | null;
+  gender?: string | null;
+  phone?: string | null;
+  description?: string | null;
+  language?: string | null;
+  bot_id: string;
+}
+
+export interface LongTermUpdateRequest {
+  user_id?: string;
+  name?: string | null;
+  gender?: string | null;
+  phone?: string | null;
+  description?: string | null;
+  language?: string | null;
+  bot_id?: string;
+}

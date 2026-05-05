@@ -33,6 +33,7 @@ const MENU_GROUPS = [
     items: [
       { id: 'simulator', label: 'Chat Simulator', icon: 'ti-headphone-alt' },
       { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
+      { id: 'live_chat', label: 'Live Chat', icon: 'ti-comments' },
     ]
   },
   {

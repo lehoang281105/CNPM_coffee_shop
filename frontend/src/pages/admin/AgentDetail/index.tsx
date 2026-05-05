@@ -11,13 +11,14 @@ import Goals from './tabs/Đào tạo/Goal/Goals';
 import FAQ from './tabs/Đào tạo/FAQ/FAQ';
 import Feedback from './tabs/Kiểm thử/Feedback/Feedback';
 import ChatSimulator from './tabs/Kiểm thử/Chat simulator/ChatSimulator';
+import LiveChatTab from './tabs/Kiểm thử/LiveChat/LiveChatTab';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'>('general');
+  const { id } = useParams<{ id: string }>();
+  const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services' | 'live_chat'>('general');
 
   const {
     bot,
@@ -32,7 +33,7 @@ const AgentDetailPage: React.FC = () => {
 
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback' || menuId === 'skills' || menuId === 'services' || menuId === 'knowledge') {
+    if (['general', 'intent', 'goals', 'branches', 'simulator', 'faq', 'feedback', 'skills', 'services', 'knowledge', 'live_chat'].includes(menuId)) {
       setActiveTab(menuId as any);
 
     }
@@ -71,7 +72,9 @@ const AgentDetailPage: React.FC = () => {
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : activeTab === 'knowledge' ? (
               <KnowledgeTab bot={bot.id} />
-              ) : (
+            ) : activeTab === 'live_chat' ? (
+              <LiveChatTab botId={bot.id} brandId={bot.brand_id} />
+            ) : (
               <Branches brandId={bot.brand_id} />
             )}
           </>
