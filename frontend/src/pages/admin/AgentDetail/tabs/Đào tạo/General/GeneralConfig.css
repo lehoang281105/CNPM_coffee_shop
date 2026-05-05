@@ -1,0 +1,309 @@
+/* ── Working Hours Section ─────────────────────────────────── */
+.wh-section {
+  margin-top: 20px;
+}
+
+.wh-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wh-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.wh-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  font-size: 13.5px;
+}
+
+.wh-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wh-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.wh-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+/* Dòng bị tắt */
+.wh-row--disabled td {
+  opacity: 0.45;
+}
+
+.wh-row--disabled .wh-day-name {
+  text-decoration: line-through;
+}
+
+/* Tên ngày */
+.wh-day-name {
+  font-weight: 600;
+  color: var(--color-text);
+  min-width: 100px;
+}
+
+/* Toggle switch dùng lại pattern từ ServiceTab */
+.wh-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.wh-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wh-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 22px;
+  transition: 0.25s;
+}
+
+.wh-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.25s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.wh-switch input:checked+.wh-slider {
+  background: var(--color-primary);
+}
+
+.wh-switch input:checked+.wh-slider::before {
+  transform: translateX(18px);
+}
+
+/* Cell chứa time inputs */
+.wh-time-cell {
+  display: inline-flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 4px 6px;
+  transition: all 0.2s ease;
+}
+
+.wh-time-cell:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 99, 210, 0.1);
+  background: #fff;
+}
+
+.wh-row--disabled .wh-time-cell {
+  background: #f1f5f9;
+  border-color: transparent;
+  opacity: 0.8;
+}
+
+/* Time input */
+.wh-time-input {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text);
+  background: transparent;
+  outline: none;
+  width: 120px;
+  text-align: center;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+.wh-time-input:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.wh-time-input:focus {
+  background: #e2e8f0;
+}
+
+.wh-time-input:disabled {
+  color: var(--color-text-sub);
+  cursor: not-allowed;
+}
+
+.wh-time-input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Mũi tên giữa start → end */
+.wh-arrow {
+  color: var(--color-text-sub);
+  font-size: 12px;
+  margin: 0 4px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e2e8f0;
+}
+
+/* Nút áp dụng tất cả */
+.wh-apply-all-btn {
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.wh-apply-all-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* ── Nudge Settings Section ────────────────────────────────── */
+.nudge-section {
+  margin-top: 20px;
+}
+
+.nudge-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nudge-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.nudge-toggle-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nudge-toggle-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.nudge-toggle-desc {
+  font-size: 12.5px;
+  color: var(--color-text-sub);
+}
+
+/* Nudge delay input */
+.nudge-delay-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--color-surface-2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--color-border);
+}
+
+.nudge-delay-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.nudge-delay-input {
+  width: 80px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  outline: none;
+  text-align: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nudge-delay-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 99, 210, 0.1);
+}
+
+.nudge-delay-unit {
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.nudge-delay-hint {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  margin-left: auto;
+  font-style: italic;
+}
+
+/* ── Saving indicator ──────────────────────────────────────── */
+.wh-saving-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 500;
+  animation: wh-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes wh-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.wh-saved-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #15803d;
+  font-weight: 500;
+}
