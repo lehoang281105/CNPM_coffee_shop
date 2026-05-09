@@ -1270,6 +1270,12 @@
   gap: 12px;
 }
 
+.goals-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .goals-title {
   font-size: 26px;
   font-weight: 800;
@@ -1284,7 +1290,7 @@
 
 .goals-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -1338,22 +1344,22 @@
   color: var(--color-text-sub);
 }
 
-.goals-search-wrap {
-  position: relative;
+.goals-filter-wrap {
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--color-surface);
-  padding: 8px 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.goals-search-wrap .search-icon {
-  left: 21px;
+.goals-search-wrap {
+  max-width: none;
 }
 
-.goals-search-wrap .search-input {
-  border: none;
-  box-shadow: none;
-  padding-left: 32px;
+.goals-intent-filter {
+  width: 240px;
 }
 
 .goals-list {
@@ -1462,6 +1468,12 @@
   font-size: 11px;
   color: var(--color-text-sub);
   margin-right: 4px;
+}
+
+.goals-item-meta--inline {
+  margin-top: 8px;
+  margin-right: 0;
+  flex-wrap: wrap;
 }
 
 .goals-intent-pill {
@@ -1721,6 +1733,28 @@
   min-height: 84px;
 }
 
+.goal-modal {
+  max-width: 760px;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-modal-body {
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+}
+
+.goal-modal-script-textarea {
+  min-height: 92px;
+}
+
+.goal-modal-rule-textarea {
+  min-height: 130px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
 @media (max-width: 1200px) {
   .intent-title {
     font-size: 24px;
@@ -1792,8 +1826,17 @@
     align-items: stretch;
   }
 
-  .goals-header > button {
-    align-self: flex-end;
+  .goals-actions {
+    justify-content: flex-end;
+  }
+
+  .goals-filter-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .goals-intent-filter {
+    width: 100%;
   }
 
   .goals-item-head {

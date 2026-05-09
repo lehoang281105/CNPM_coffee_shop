@@ -1,16 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import NotificationModal from '../../../../../../components/common/NotificationModal';
 import { useGoals } from '../../../../../../hooks/admin/useGoals';
-import type { Goal } from '../../../../../../types';
-import GoalReplyModal from './GoalReplyModal';
-import GoalScriptModal from './GoalScriptModal';
-import {
-  buildGoalRule,
-  makeGoalNameFromScript,
-  parseGoalRule,
-  type ReplySample,
-} from '../../../../../../utils/goalHelpers';
+import type {
+  Goal,
+  GoalCreatePayload,
+  GoalUpdatePayload,
+} from '../../../../../../types';
+import { parseGoalRule } from '../../../../../../utils/goalHelpers';
 import { parseIntentMeta } from '../../../../../../utils/intentHelpers';
+import GoalModal from './GoalModal';
 
 interface GoalsProps {
   botId?: string;
@@ -30,9 +28,9 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
   } = useGoals(botId);
 
   const [search, setSearch] = useState('');
+  const [intentFilter, setIntentFilter] = useState('all');
   const [expandedGoalIds, setExpandedGoalIds] = useState<string[]>([]);
-  const [scriptModal, setScriptModal] = useState<{ mode: 'create' | 'edit'; goal?: Goal } | null>(null);
-  const [replyGoal, setReplyGoal] = useState<Goal | null>(null);
+  const [modalState, setModalState] = useState<{ mode: 'create' | 'edit'; goal?: Goal } | null>(null);
   const [deletingGoal, setDeletingGoal] = useState<Goal | null>(null);
   const [notification, setNotification] = useState<{
     title: string;
@@ -50,78 +48,81 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
   };
 
   const intentMap = useMemo(() => {
-    const map = new Map<string, { machine: string; display: string; examples: string[] }>();
+    const map = new Map<string, { machine: string; display: string }>();
 
     intents.forEach((intent) => {
       const parsedMeta = parseIntentMeta(intent);
       map.set(intent.id, {
         machine: intent.name,
         display: parsedMeta.displayName,
-        examples: parsedMeta.examples,
       });
     });
 
     return map;
   }, [intents]);
 
-  const goalRuleMap = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof parseGoalRule>>();
-    goals.forEach((goal) => map.set(goal.id, parseGoalRule(goal)));
-    return map;
-  }, [goals]);
+  const goalRows = useMemo(
+    () =>
+      goals.map((goal) => ({
+        goal,
+        parsedRule: parseGoalRule(goal),
+        intentInfo: goal.intent_id ? intentMap.get(goal.intent_id) : null,
+      })),
+    [goals, intentMap]
+  );
 
-  const filteredGoals = useMemo(() => {
+  const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return goals;
-
-    return goals.filter((goal) => {
-      const intentInfo = goal.intent_id ? intentMap.get(goal.intent_id) : null;
-      const ruleData = goalRuleMap.get(goal.id);
-      const samplesText = (ruleData?.samples ?? [])
-        .flatMap((sample) => [sample.user, sample.assistant])
-        .join(' ');
+    return goalRows.filter(({ goal, parsedRule, intentInfo }) => {
+      if (intentFilter !== 'all' && goal.intent_id !== intentFilter) return false;
+      if (!q) return true;
 
       const haystack = [
         goal.name,
         goal.description,
         goal.script ?? '',
         goal.target_goal ?? '',
+        goal.rule ?? '',
         intentInfo?.machine ?? '',
         intentInfo?.display ?? '',
-        samplesText,
+        ...parsedRule.samples.flatMap((sample) => [sample.user, sample.assistant]),
+        ...parsedRule.skills,
       ]
         .join(' ')
         .toLowerCase();
 
       return haystack.includes(q);
     });
-  }, [goals, search, intentMap, goalRuleMap]);
+  }, [goalRows, intentFilter, search]);
 
-  const totalReplySamples = useMemo(
-    () => goals.reduce((sum, goal) => sum + (goalRuleMap.get(goal.id)?.samples.length ?? 0), 0),
-    [goals, goalRuleMap]
+  const totalLinkedIntents = useMemo(
+    () =>
+      new Set(
+        goals
+          .map((goal) => goal.intent_id)
+          .filter((intentId): intentId is string => Boolean(intentId))
+      ).size,
+    [goals]
   );
 
-  const totalTargets = useMemo(() => {
-    const uniqueTargets = new Set(
-      goals.map((goal) => (goal.target_goal || goal.name || '').trim()).filter(Boolean)
-    );
-    return uniqueTargets.size;
-  }, [goals]);
+  const totalRules = useMemo(
+    () => goals.filter((goal) => Boolean(goal.rule?.trim())).length,
+    [goals]
+  );
 
   useEffect(() => {
-    if (filteredGoals.length === 0) {
+    if (filteredRows.length === 0) {
       setExpandedGoalIds([]);
       return;
     }
 
     setExpandedGoalIds((prev) => {
       if (prev.length > 0) {
-        return prev.filter((goalId) => filteredGoals.some((goal) => goal.id === goalId));
+        return prev.filter((goalId) => filteredRows.some((row) => row.goal.id === goalId));
       }
-      return [filteredGoals[0].id];
+      return [filteredRows[0].goal.id];
     });
-  }, [filteredGoals]);
+  }, [filteredRows]);
 
   const toggleExpanded = (goalId: string) => {
     setExpandedGoalIds((prev) =>
@@ -129,85 +130,28 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
     );
   };
 
-  const handleSubmitScript = async (scriptText: string) => {
-    if (!scriptModal) return;
-
+  const handleSubmitGoal = async (
+    payload: GoalCreatePayload | GoalUpdatePayload
+  ) => {
+    if (!modalState) return;
     try {
-      if (scriptModal.mode === 'edit' && scriptModal.goal) {
-        await updateGoalItem(scriptModal.goal.id, {
-          name: scriptModal.goal.name,
-          bot_id: scriptModal.goal.bot_id,
-          script: scriptText,
-          description: scriptText,
-          intent_id: scriptModal.goal.intent_id ?? null,
-          target_goal: scriptModal.goal.target_goal ?? null,
-          rule: scriptModal.goal.rule ?? null,
-        });
+      if (modalState.mode === 'edit' && modalState.goal) {
+        await updateGoalItem(modalState.goal.id, payload as GoalUpdatePayload);
         setNotification({
           title: 'Thành công',
-          message: 'Đã cập nhật kịch bản.',
+          message: 'Đã cập nhật mục tiêu.',
           type: 'success',
         });
       } else {
-        if (!botId) {
-          setNotification({
-            title: 'Lỗi',
-            message: 'Thiếu bot_id để tạo kịch bản.',
-            type: 'error',
-          });
-          return;
-        }
-
-        const goalName = makeGoalNameFromScript(scriptText, goals.length + 1);
-        await createGoalItem({
-          name: goalName,
-          description: scriptText,
-          script: scriptText,
-          bot_id: botId,
-          intent_id: null,
-          target_goal: null,
-          rule: null,
-        });
+        await createGoalItem(payload as GoalCreatePayload);
         setNotification({
           title: 'Thành công',
-          message: 'Đã tạo kịch bản mới.',
+          message: 'Đã tạo mục tiêu mới.',
           type: 'success',
         });
       }
 
-      setScriptModal(null);
-    } catch (err) {
-      setNotification({
-        title: 'Lỗi',
-        message: getErrorMessage(err),
-        type: 'error',
-      });
-    }
-  };
-
-  const handleAddReplySample = async (sample: ReplySample) => {
-    if (!replyGoal) return;
-
-    try {
-      const nextRule = buildGoalRule(replyGoal, (current) => ({
-        samples: [...current.samples, sample],
-      }));
-
-      await updateGoalItem(replyGoal.id, {
-        name: replyGoal.name,
-        description: replyGoal.description,
-        script: replyGoal.script ?? replyGoal.description,
-        intent_id: replyGoal.intent_id ?? null,
-        bot_id: replyGoal.bot_id,
-        target_goal: replyGoal.target_goal ?? null,
-        rule: nextRule,
-      });
-      setReplyGoal(null);
-      setNotification({
-        title: 'Thành công',
-        message: 'Đã thêm mẫu câu trả lời.',
-        type: 'success',
-      });
+      setModalState(null);
     } catch (err) {
       setNotification({
         title: 'Lỗi',
@@ -237,6 +181,14 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
     }
   };
 
+  const formatDateTime = (value?: number) => {
+    if (!value) return '--';
+    const msValue = value > 1_000_000_000_000 ? value : value * 1000;
+    const date = new Date(msValue);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString('vi-VN');
+  };
+
   return (
     <>
       <section className="goals-page">
@@ -255,12 +207,28 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
 
         <div className="goals-header">
           <div>
-            <h1 className="goals-title">Kịch bản huấn luyện</h1>
-            <p className="goals-subtitle">Mô tả kịch bản bằng tiếng Việt → AI tự sinh Intent → Goals → Hướng dẫn → Skills</p>
+            <h1 className="goals-title">Mục tiêu (Goals)</h1>
+            <p className="goals-subtitle">
+              Quản lý mục tiêu theo API /api/goals và liên kết với intent của bot
+            </p>
           </div>
-          <button type="button" className="btn btn--primary" onClick={() => setScriptModal({ mode: 'create' })}>
-            <i className="ti-plus"></i> Tạo kịch bản
-          </button>
+          <div className="goals-actions">
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={fetchGoals}
+              disabled={loading}
+            >
+              <i className="ti-reload"></i> Làm mới
+            </button>
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => setModalState({ mode: 'create' })}
+            >
+              <i className="ti-plus"></i> Thêm mục tiêu
+            </button>
+          </div>
         </div>
 
         <div className="goals-stats-grid">
@@ -270,7 +238,7 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
             </div>
             <div>
               <strong>{goals.length}</strong>
-              <span>Kịch bản</span>
+              <span>Tổng goals</span>
             </div>
           </div>
 
@@ -279,8 +247,8 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
               <i className="ti-check"></i>
             </div>
             <div>
-              <strong>{goals.length}</strong>
-              <span>Đang hoạt động</span>
+              <strong>{totalLinkedIntents}</strong>
+              <span>Đã gắn intent</span>
             </div>
           </div>
 
@@ -289,32 +257,39 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
               <i className="ti-layout-list-thumb"></i>
             </div>
             <div>
-              <strong>{totalTargets}</strong>
-              <span>Mục tiêu</span>
-            </div>
-          </div>
-
-          <div className="goals-stat-card">
-            <div className="goals-stat-icon amber">
-              <i className="ti-comment-alt"></i>
-            </div>
-            <div>
-              <strong>{totalReplySamples}</strong>
-              <span>Mẫu câu trả lời</span>
+              <strong>{totalRules}</strong>
+              <span>Có rule</span>
             </div>
           </div>
         </div>
 
-        <div className="goals-search-wrap">
-          <span className="search-icon">
-            <i className="ti-search"></i>
-          </span>
-          <input
-            className="search-input"
-            placeholder="Tìm kịch bản..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="goals-filter-wrap">
+          <div className="search-wrap goals-search-wrap">
+            <span className="search-icon">
+              <i className="ti-search"></i>
+            </span>
+            <input
+              className="search-input"
+              placeholder="Tìm theo tên, mô tả, script, rule..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <select
+            className="form-select goals-intent-filter"
+            value={intentFilter}
+            onChange={(e) => setIntentFilter(e.target.value)}
+          >
+            <option value="all">Tất cả intent</option>
+            {intents.map((intent) => {
+              const meta = parseIntentMeta(intent);
+              return (
+                <option key={intent.id} value={intent.id}>
+                  {meta.displayName} ({intent.name})
+                </option>
+              );
+            })}
+          </select>
         </div>
 
         <div className="goals-list">
@@ -323,19 +298,13 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
               <div className="goals-item-skeleton"></div>
               <div className="goals-item-skeleton"></div>
             </>
-          ) : filteredGoals.length === 0 ? (
-            <div className="goals-empty">Chưa có mục tiêu phù hợp với từ khóa tìm kiếm.</div>
+          ) : filteredRows.length === 0 ? (
+            <div className="goals-empty">Chưa có mục tiêu phù hợp với bộ lọc hiện tại.</div>
           ) : (
-            filteredGoals.map((goal) => {
+            filteredRows.map(({ goal, intentInfo, parsedRule }) => {
               const expanded = expandedGoalIds.includes(goal.id);
-              const intentInfo = goal.intent_id ? intentMap.get(goal.intent_id) : null;
-              const parsedRule = goalRuleMap.get(goal.id) ?? { samples: [], skills: [], raw: {} };
               const sampleCount = parsedRule.samples.length;
-              const skills = parsedRule.skills.length
-                ? parsedRule.skills
-                : goal.target_goal
-                  ? [goal.target_goal]
-                  : [];
+              const skillCount = parsedRule.skills.length;
 
               return (
                 <article className={`goals-item-card ${expanded ? 'is-expanded' : ''}`} key={goal.id}>
@@ -347,17 +316,25 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
                       <div className="goals-item-content">
                         <p className="goals-item-name-line">
                           <span className="goals-item-name">{goal.name}</span>
-                          <span className="goals-item-badge">Hoạt động</span>
+                          {goal.target_goal?.trim() && (
+                            <span className="goals-item-badge">{goal.target_goal}</span>
+                          )}
                         </p>
                         <p className="goals-item-description">{goal.description}</p>
+                        <div className="goals-item-meta goals-item-meta--inline">
+                          {intentInfo ? (
+                            <span className="goals-intent-pill">{intentInfo.display}</span>
+                          ) : (
+                            <span>Chưa gắn intent</span>
+                          )}
+                          <span>{sampleCount} Q&amp;A</span>
+                          <span>{skillCount} skills</span>
+                          <span>{goal.id}</span>
+                        </div>
                       </div>
                     </div>
 
                     <div className="goals-item-actions">
-                      <div className="goals-item-meta">
-                        {intentInfo && <span className="goals-intent-pill">{intentInfo.display}</span>}
-                        <span>{sampleCount} Q&amp;A</span>
-                      </div>
                       <button
                         type="button"
                         className="goals-icon-btn"
@@ -369,8 +346,8 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
                       <button
                         type="button"
                         className="goals-icon-btn"
-                        title="Chỉnh sửa kịch bản"
-                        onClick={() => setScriptModal({ mode: 'edit', goal })}
+                        title="Chỉnh sửa"
+                        onClick={() => setModalState({ mode: 'edit', goal })}
                       >
                         <i className="ti-pencil-alt"></i>
                       </button>
@@ -388,57 +365,51 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
 
                   {expanded && (
                     <div className="goals-item-expanded">
-                      <div className="goals-section intent">
+                      <div className="goals-section">
                         <p className="goals-section-title">
-                          <i className="ti-info-alt"></i> INTENT:{' '}
-                          {intentInfo ? `${intentInfo.display} (${intentInfo.machine})` : 'Chưa liên kết'}
+                          <i className="ti-align-left"></i> Script
                         </p>
-                        {intentInfo?.examples.length ? (
-                          <div className="goals-chip-wrap">
-                            {intentInfo.examples.slice(0, 6).map((example) => (
-                              <span className="goals-chip gray" key={`${goal.id}-${example}`}>
-                                {example}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
+                        {goal.script?.trim() ? (
+                          <p className="goals-template-text">{goal.script}</p>
+                        ) : (
+                          <p className="goals-empty-sub">Chưa cấu hình script cho goal này.</p>
+                        )}
                       </div>
 
                       <div className="goals-section">
                         <p className="goals-section-title">
-                          <i className="ti-layout-list-thumb"></i> 1 MỤC TIÊU — THỨ TỰ XỬ LÝ
+                          <i className="ti-file"></i> Rule
                         </p>
-                        <div className="goals-chip-wrap">
-                          <span className="goals-chip blue">{goal.target_goal || goal.name}</span>
-                        </div>
+                        {goal.rule?.trim() ? (
+                          <p className="goals-template-text">{goal.rule}</p>
+                        ) : (
+                          <p className="goals-empty-sub">Chưa cấu hình rule cho goal này.</p>
+                        )}
                       </div>
 
-                      <div className="goals-main-goal-card">
-                        <div>
-                          <strong>{goal.name}</strong>
-                          <p>{goal.description}</p>
-                        </div>
-                        <div className="goals-progress-meta">
-                          <span>95% hoàn thành</span>
+                      <div className="goals-section skills">
+                        <p className="goals-section-title">
+                          <i className="ti-bolt-alt"></i> Skills được parse từ rule ({skillCount})
+                        </p>
+                        <div className="goals-chip-wrap">
+                          {parsedRule.skills.length > 0 ? (
+                            parsedRule.skills.map((skill) => (
+                              <span key={`${goal.id}-${skill}`} className="goals-chip green">
+                                {skill}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="goals-empty-sub">Chưa có skills.</span>
+                          )}
                         </div>
                       </div>
 
                       <div className="goals-section answer">
-                        <div className="goals-section-title-row">
-                          <p className="goals-section-title">
-                            <i className="ti-comment-alt"></i> HƯỚNG DẪN TRẢ LỜI ({sampleCount})
-                          </p>
-                          <button
-                            type="button"
-                            className="goals-link-btn"
-                            onClick={() => setReplyGoal(goal)}
-                          >
-                            <i className="ti-plus"></i> Thêm mẫu
-                          </button>
-                        </div>
-
+                        <p className="goals-section-title">
+                          <i className="ti-comment-alt"></i> Mẫu hội thoại ({sampleCount})
+                        </p>
                         {sampleCount === 0 ? (
-                          <p className="goals-empty-sub">Chưa có mẫu câu — AI sẽ dùng câu trả lời chung của Goal.</p>
+                          <p className="goals-empty-sub">Chưa có mẫu hội thoại trong rule.</p>
                         ) : (
                           <div className="goals-sample-list">
                             {parsedRule.samples.map((sample, idx) => (
@@ -455,39 +426,21 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
                         )}
                       </div>
 
-                      <div className="goals-section template">
-                        <div className="goals-section-title-row">
-                          <p className="goals-section-title">
-                            <i className="ti-files"></i> TIN NHẮN MẪU (TEMPLATE)
-                          </p>
-                          <button
-                            type="button"
-                            className="goals-link-btn"
-                            onClick={() => setScriptModal({ mode: 'edit', goal })}
-                          >
-                            <i className="ti-pencil-alt"></i> Cấu hình
-                          </button>
-                        </div>
-
-                        <p className="goals-template-text">
-                          {goal.script?.trim() || 'Chưa cấu hình template — AI sẽ dùng văn bản thuần.'}
-                        </p>
-                      </div>
-
-                      <div className="goals-section skills">
+                      <div className="goals-section">
                         <p className="goals-section-title">
-                          <i className="ti-bolt-alt"></i> SKILLS ĐƯỢC GỌI ({skills.length})
+                          <i className="ti-info-alt"></i> Thông tin
                         </p>
                         <div className="goals-chip-wrap">
-                          {skills.length > 0 ? (
-                            skills.map((skill) => (
-                              <span key={`${goal.id}-${skill}`} className="goals-chip green">
-                                {skill}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="goals-empty-sub">Chưa có skills.</span>
-                          )}
+                          <span className="goals-chip gray">ID: {goal.id}</span>
+                          <span className="goals-chip gray">
+                            Cập nhật: {formatDateTime(goal.updated_at)}
+                          </span>
+                          <span className="goals-chip gray">
+                            Tạo lúc: {formatDateTime(goal.created_at)}
+                          </span>
+                          <span className="goals-chip blue">
+                            Intent: {intentInfo ? `${intentInfo.display} (${intentInfo.machine})` : 'Chưa gắn'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -499,21 +452,15 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
         </div>
       </section>
 
-      {scriptModal && (
-        <GoalScriptModal
-          mode={scriptModal.mode}
-          initialScript={scriptModal.goal?.script || scriptModal.goal?.description || ''}
+      {modalState && (
+        <GoalModal
+          mode={modalState.mode}
+          goal={modalState.goal}
+          intents={intents}
+          botId={botId}
           loading={submitting}
-          onClose={() => setScriptModal(null)}
-          onSubmit={handleSubmitScript}
-        />
-      )}
-
-      {replyGoal && (
-        <GoalReplyModal
-          loading={submitting}
-          onClose={() => setReplyGoal(null)}
-          onSubmit={handleAddReplySample}
+          onClose={() => setModalState(null)}
+          onSubmit={handleSubmitGoal}
         />
       )}
 
