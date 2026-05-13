@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { InboxConversationItem, LongTermBaseResponse, LongTermCreateRequest, LongTermUpdateRequest } from '../../../../../../../types';
 import * as longtermService from '../../../../../../../services/admin/longtermService';
+import ConfirmModal from '../../../../../../../components/common/ConfirmModal';
+import NotificationModal from '../../../../../../../components/common/NotificationModal';
 
 interface Props {
   conversation: InboxConversationItem | null;
@@ -12,6 +14,8 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
   const [profile, setProfile] = useState<LongTermBaseResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState<LongTermUpdateRequest>({
     name: '',
     phone: '',
@@ -28,24 +32,32 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
       setLongtermId('');
       setFormData({ name: '', phone: '', gender: '', description: '', language: '' });
     }
-  }, [conversation]);
+  }, [conversation?.user_id, conversation?.bot_id]);
 
   const fetchProfile = async () => {
     if (!conversation) return;
     setLoading(true);
     try {
-      const res = await longtermService.getLongTerms({
-        user_id: conversation.user_id,
-        bot_id: conversation.bot_id
-      });
-      const data = Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
+      const res = await longtermService.getAllLongTerms(); // Lấy từ endpoint /all
+      // Lọc thủ công bằng JS vì Backend không bắt query param
+      const allProfiles = Array.isArray(res.data) ? res.data : [];
+      const data = allProfiles.find(item => 
+        item.user_id === conversation.user_id && 
+        item.bot_id === conversation.bot_id
+      ) || null;
+
       if (data) {
+        let genderStr = data.gender || '';
+        if (genderStr.toLowerCase() === 'male') genderStr = 'Nam';
+        if (genderStr.toLowerCase() === 'female') genderStr = 'Nữ';
+        if (genderStr.toLowerCase() === 'other') genderStr = 'Khác';
+
         setProfile(data);
         setLongtermId(data.id);
         setFormData({
           name: data.name || '',
           phone: data.phone || '',
-          gender: data.gender || '',
+          gender: genderStr,
           description: data.description || '',
           language: data.language || ''
         });
@@ -61,12 +73,17 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
     }
   };
 
-  const handleSave = async () => {
+  const confirmSave = async () => {
+    setShowConfirm(false);
     if (!conversation) return;
     setSaving(true);
     try {
       if (longtermId) {
-        await longtermService.updateLongTerm(longtermId, formData);
+        await longtermService.updateLongTerm(longtermId, {
+          ...formData,
+          user_id: conversation.user_id,
+          bot_id: conversation.bot_id
+        });
       } else {
         const createPayload: LongTermCreateRequest = {
           user_id: conversation.user_id,
@@ -82,7 +99,7 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
           setLongtermId(res.data.id);
         }
       }
-      // Optional: show success toast
+      setShowSuccess(true);
     } catch (e) {
       console.error("Failed to update profile", e);
     } finally {
@@ -139,9 +156,10 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
               >
                 <option value="">-- Chọn giới tính --</option>
-                <option value="male">Nam</option>
-                <option value="female">Nữ</option>
-                <option value="other">Khác</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Khác">Khác</option>
+                <option value="Chưa xác định">Chưa xác định</option>
               </select>
             </div>
 
@@ -170,12 +188,33 @@ const UserProfilePanel: React.FC<Props> = ({ conversation, onCollapse }) => {
       <div className="user-profile-actions">
         <button
           className="btn-save-profile"
-          onClick={handleSave}
+          onClick={() => setShowConfirm(true)}
           disabled={loading || saving}
         >
           {saving ? 'Đang lưu...' : 'Lưu thông tin'}
         </button>
       </div>
+
+      {showConfirm && (
+        <ConfirmModal
+          title="Lưu thông tin khách hàng"
+          message="Bạn có chắc chắn muốn lưu lại các thay đổi thông tin này không?"
+          confirmText="Lưu thay đổi"
+          cancelText="Hủy"
+          type="info"
+          onConfirm={confirmSave}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+      
+      {showSuccess && (
+        <NotificationModal
+          title="Thành công"
+          message="Đã cập nhật thông tin khách hàng thành công!"
+          type="success"
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
     </div>
   );
 };

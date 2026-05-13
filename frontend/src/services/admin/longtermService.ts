@@ -11,6 +11,11 @@ export const getLongTerms = (params?: { user_id?: string; bot_id?: string; page?
     .get<ApiResponse<LongTermBaseResponse[]>>('/longterms', { params })
     .then((r) => r.data);
 
+export const getAllLongTerms = () =>
+  axiosInstance
+    .get<ApiResponse<LongTermBaseResponse[]>>('/longterms/all')
+    .then((r) => r.data);
+
 export const createLongTerm = (payload: LongTermCreateRequest) =>
   axiosInstance
     .post<ApiResponse<LongTermBaseResponse>>('/longterms', payload)
