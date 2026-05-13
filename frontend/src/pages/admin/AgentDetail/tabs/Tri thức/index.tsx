@@ -5,9 +5,9 @@ import StatCard from '../../../../../components/knowledge/StatCard';
 import AddKnowledgeModal from '../../../../../components/knowledge/AddKnowledgeModal';
 import { IconBrand, IconAgent, IconChatbot, IconTotal, IconSync } from '../../../../../components/common/Icons';
 
-import BrandSection from './components/BrandSection';
-import AgentSection from './components/AgentSection';
-import MassChatbotSection from './components/MassChatbotSection';
+import BrandSection from '../../../../../components/tri thức/BrandSection';
+import AgentSection from '../../../../../components/tri thức/AgentSection';
+import MassChatbotSection from '../../../../../components/tri thức/MassChatbotSection';
 
 interface KnowledgeTabProps {
   bot?: string;

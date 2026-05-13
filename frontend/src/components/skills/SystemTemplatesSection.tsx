@@ -1,8 +1,8 @@
 import React from 'react';
-import { IconDatabase, IconSearch } from '../../../../../../components/common/Icons';
+import { IconDatabase, IconSearch } from '../common/Icons';
 import SkillTemplateCard from './SkillTemplateCard';
-import { SkillTemplate } from '../mockData';
-import type { SkillBaseResponse } from '../../../../../../types';
+import { SkillTemplate } from '../../pages/admin/AgentDetail/tabs/Skills/mockData';
+import type { SkillBaseResponse } from '../../types';
 
 interface SystemTemplatesSectionProps {
   searchQuery: string;
@@ -37,9 +37,9 @@ const SystemTemplatesSection: React.FC<SystemTemplatesSectionProps> = ({
         </div>
         <div className="relative w-full sm:w-64">
           <IconSearch className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input 
-            type="text" 
-            placeholder="Tìm skill..." 
+          <input
+            type="text"
+            placeholder="Tìm skill..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
@@ -52,9 +52,9 @@ const SystemTemplatesSection: React.FC<SystemTemplatesSectionProps> = ({
           {filteredTemplates.map((template: SkillTemplate) => {
             const isActivated = customSkills.some(skill => skill.name === template.name);
             return (
-              <SkillTemplateCard 
-                key={template.id} 
-                template={template} 
+              <SkillTemplateCard
+                key={template.id}
+                template={template}
                 isActivated={isActivated}
                 isActivating={activatingTemplateId === template.id}
                 onActivate={onActivateTemplate}

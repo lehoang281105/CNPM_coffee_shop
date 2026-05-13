@@ -1,8 +1,8 @@
 import React from 'react';
-import IntegrationRow from '../../../../../../components/knowledge/IntegrationRow';
-import { IconChatbot, IconChevronRight, IconModule } from '../../../../../../components/common/Icons';
-import type { MassModule } from '../../../../../../types';
-import { mockIntegrations } from '../mockData';
+import IntegrationRow from '../knowledge/IntegrationRow';
+import { IconChatbot, IconChevronRight, IconModule } from '../common/Icons';
+import type { MassModule } from '../../types';
+import { mockIntegrations } from '../../pages/admin/AgentDetail/tabs/Tri thức/mockData';
 
 interface MassChatbotSectionProps {
   massModules: MassModule[];

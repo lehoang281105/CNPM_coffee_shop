@@ -1,6 +1,6 @@
 import React from 'react';
-import  { SkillTemplate } from '../mockData';
-import { IconCheckCircle } from '../../../../../../components/common/Icons';
+import { SkillTemplate } from '../../pages/admin/AgentDetail/tabs/Skills/mockData';
+import { IconCheckCircle } from '../common/Icons';
 
 interface SkillTemplateCardProps {
   template: SkillTemplate;
@@ -10,8 +10,8 @@ interface SkillTemplateCardProps {
   onDeactivate?: (template: SkillTemplate) => void;
 }
 
-const SkillTemplateCard: React.FC<SkillTemplateCardProps> = ({ 
-  template, 
+const SkillTemplateCard: React.FC<SkillTemplateCardProps> = ({
+  template,
   isActivated = false,
   isActivating = false,
   onActivate,
@@ -29,13 +29,11 @@ const SkillTemplateCard: React.FC<SkillTemplateCardProps> = ({
   const badgeColorClass = colorMap[template.categoryColor] || colorMap.blue;
 
   return (
-    <div className={`border rounded-xl p-5 flex flex-col transition-colors shadow-sm ${
-      isActivated ? 'border-green-400 bg-green-50/30' : 'border-gray-200 bg-white hover:border-blue-300'
-    }`}>
+    <div className={`border rounded-xl p-5 flex flex-col transition-colors shadow-sm ${isActivated ? 'border-green-400 bg-green-50/30' : 'border-gray-200 bg-white hover:border-blue-300'
+      }`}>
       <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-          isActivated ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
-        }`}>
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isActivated ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
+          }`}>
           {template.icon}
         </div>
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
@@ -45,19 +43,18 @@ const SkillTemplateCard: React.FC<SkillTemplateCardProps> = ({
           </span>
         </div>
       </div>
-      
+
       <p className="text-sm text-gray-500 mb-5 flex-1 line-clamp-2">
         {template.description}
       </p>
 
-      <button 
+      <button
         onClick={() => isActivated ? (onDeactivate && onDeactivate(template)) : (onActivate && onActivate(template))}
         disabled={isActivating}
-        className={`w-full py-2.5 rounded-lg text-sm font-medium flex justify-center items-center gap-1.5 transition-colors disabled:opacity-70 ${
-          isActivated 
-            ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' 
+        className={`w-full py-2.5 rounded-lg text-sm font-medium flex justify-center items-center gap-1.5 transition-colors disabled:opacity-70 ${isActivated
+            ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
             : 'bg-blue-600 text-white hover:bg-blue-700'
-        }`}
+          }`}
       >
         {isActivating ? (
           <svg className={`animate-spin -ml-1 mr-2 h-4 w-4 ${isActivated ? 'text-gray-500' : 'text-white'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

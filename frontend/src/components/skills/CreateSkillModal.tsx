@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { IconClose } from '../../../../../../components/common/Icons';
-import { createSkill, updateSkill } from '../../../../../../services/admin/skillService';
-import type { SkillBaseResponse } from '../../../../../../types';
+import { IconClose } from '../common/Icons';
+import { createSkill, updateSkill } from '../../services/admin/skillService';
+import type { SkillBaseResponse } from '../../types';
 
 interface CreateSkillModalProps {
   isOpen: boolean;
@@ -12,13 +12,13 @@ interface CreateSkillModalProps {
   editData?: SkillBaseResponse | null;
 }
 
-const CreateSkillModal: React.FC<CreateSkillModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSuccess, 
-  agentId, 
+const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  agentId,
   brandId,
-  editData 
+  editData
 }) => {
   const [machineName, setMachineName] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -59,7 +59,7 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
       setError(null);
 
       const payload = {
-        name: machineName.trim(), 
+        name: machineName.trim(),
         description: description.trim(),
         endpoint: editData?.endpoint || "",
         method: editData?.method || "POST",
@@ -91,7 +91,7 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="text-lg font-bold text-gray-900">{editData ? 'Chỉnh sửa Skill custom' : 'Tạo Skill custom mới'}</h3>
-          <button 
+          <button
             onClick={handleClose}
             disabled={isLoading}
             className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg transition-colors disabled:opacity-50"
@@ -110,11 +110,11 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Machine Name</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={machineName}
               onChange={(e) => setMachineName(e.target.value)}
-              placeholder="VD: tim_chi_nhanh" 
+              placeholder="VD: tim_chi_nhanh"
               disabled={isLoading}
               className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
             />
@@ -122,11 +122,11 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Tên hiển thị</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="VD: Tìm chi nhánh gần nhất" 
+              placeholder="VD: Tìm chi nhánh gần nhất"
               disabled={isLoading}
               className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
             />
@@ -134,7 +134,7 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mô tả</label>
-            <textarea 
+            <textarea
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -152,7 +152,7 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
 
           {/* Footer */}
           <div className="pt-2 flex justify-between gap-3">
-            <button 
+            <button
               type="button"
               onClick={handleClose}
               disabled={isLoading}
@@ -160,7 +160,7 @@ const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
             >
               Hủy
             </button>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm disabled:opacity-70 transition-colors"

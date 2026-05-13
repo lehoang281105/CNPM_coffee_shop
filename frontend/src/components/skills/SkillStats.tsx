@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconLightning, IconDatabase, IconPlay, IconCheckCircle } from '../../../../../../components/common/Icons';
+import { IconLightning, IconDatabase, IconPlay, IconCheckCircle } from '../common/Icons';
 
 interface SkillStatsProps {
   customCount: number;
@@ -7,7 +7,7 @@ interface SkillStatsProps {
   totalTemplateCount?: number;
 }
 
-const SkillStats: React.FC<SkillStatsProps> = ({ 
+const SkillStats: React.FC<SkillStatsProps> = ({
   customCount,
   activatedTemplateCount = 0,
   totalTemplateCount = 8

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSkills } from '../../../../../hooks/admin/useSkills';
-import SkillStats from './components/SkillStats';
-import CreateSkillModal from './components/CreateSkillModal';
-import SystemTemplatesSection from './components/SystemTemplatesSection';
-import CustomSkillsSection from './components/CustomSkillsSection';
+import SkillStats from '../../../../../components/skills/SkillStats';
+import CreateSkillModal from '../../../../../components/skills/CreateSkillModal';
+import SystemTemplatesSection from '../../../../../components/skills/SystemTemplatesSection';
+import CustomSkillsSection from '../../../../../components/skills/CustomSkillsSection';
 import { mockTemplates, SkillTemplate } from './mockData';
 import { IconPlus } from '../../../../../components/common/Icons';
 import type { SkillBaseResponse } from '../../../../../types';
@@ -15,17 +15,17 @@ interface SkillsTabProps {
 
 const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
   const { id: agentId } = useParams<{ id: string }>();
-  const { 
-    customSkills, 
-    loading, 
-    error, 
+  const {
+    customSkills,
+    loading,
+    error,
     refetch,
     activatingTemplateId,
     activateTemplate,
     deactivateTemplate,
     deleteCustomSkill
   } = useSkills(agentId, brandId);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editSkillData, setEditSkillData] = useState<SkillBaseResponse | null>(null);
@@ -36,30 +36,30 @@ const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
   };
 
   // Lọc template giả định
-  const filteredTemplates = mockTemplates.filter((t: SkillTemplate) => 
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredTemplates = mockTemplates.filter((t: SkillTemplate) =>
+    t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activatedTemplateCount = mockTemplates.filter(t => 
+  const activatedTemplateCount = mockTemplates.filter(t =>
     customSkills.some(skill => skill.name === t.name)
   ).length;
 
   // Tách biệt những Skill thực sự do user tạo (không trùng tên với template)
-  const realCustomSkills = customSkills.filter(skill => 
+  const realCustomSkills = customSkills.filter(skill =>
     !mockTemplates.some(t => t.name === skill.name)
   );
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-[22px] font-bold text-gray-900 mb-1">Skills</h2>
           <p className="text-sm text-gray-500">Công cụ AI gọi trong hội thoại để thực hiện thao tác</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsCreateModalOpen(true)}
           className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-colors"
         >
@@ -69,8 +69,8 @@ const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
       </div>
 
       {/* Stats Cards */}
-      <SkillStats 
-        customCount={realCustomSkills.length} 
+      <SkillStats
+        customCount={realCustomSkills.length}
         activatedTemplateCount={activatedTemplateCount}
         totalTemplateCount={mockTemplates.length}
       />
@@ -86,7 +86,7 @@ const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
       )}
 
       {/* Section 1: Template */}
-      <SystemTemplatesSection 
+      <SystemTemplatesSection
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filteredTemplates={filteredTemplates}
@@ -97,7 +97,7 @@ const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
       />
 
       {/* Section 2: Custom Skills */}
-      <CustomSkillsSection 
+      <CustomSkillsSection
         loading={loading}
         realCustomSkills={realCustomSkills}
         onEditSkill={handleEdit}
@@ -106,7 +106,7 @@ const SkillsTab: React.FC<SkillsTabProps> = ({ brandId }) => {
       />
 
       {/* Modals */}
-      <CreateSkillModal 
+      <CreateSkillModal
         isOpen={isCreateModalOpen}
         onClose={() => {
           setIsCreateModalOpen(false);

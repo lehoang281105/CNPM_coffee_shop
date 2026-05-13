@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IconLightning, IconDots, IconEdit, IconTrash } from '../../../../../../components/common/Icons';
-import type { SkillBaseResponse } from '../../../../../../types';
+import { IconLightning, IconDots, IconEdit, IconTrash } from '../common/Icons';
+import type { SkillBaseResponse } from '../../types';
 
 interface SkillCustomRowProps {
   skill: SkillBaseResponse;
@@ -10,9 +10,9 @@ interface SkillCustomRowProps {
   onDelete?: (skillId: string) => void;
 }
 
-const SkillCustomRow: React.FC<SkillCustomRowProps> = ({ 
-  skill, 
-  executionCount = '0', 
+const SkillCustomRow: React.FC<SkillCustomRowProps> = ({
+  skill,
+  executionCount = '0',
   successRate = '0%',
   onEdit,
   onDelete
@@ -54,7 +54,7 @@ const SkillCustomRow: React.FC<SkillCustomRowProps> = ({
           <div className="text-[11px] text-gray-500 font-medium">lần • {successRate}</div>
         </div>
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className={`text-gray-400 hover:text-gray-600 p-1.5 rounded-lg transition-colors ${isDropdownOpen ? 'bg-gray-100 text-gray-600' : 'hover:bg-gray-100'}`}
           >
@@ -64,7 +64,7 @@ const SkillCustomRow: React.FC<SkillCustomRowProps> = ({
           {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg z-10 overflow-hidden py-1">
-              <button 
+              <button
                 onClick={() => {
                   setIsDropdownOpen(false);
                   if (onEdit) onEdit(skill);
@@ -74,7 +74,7 @@ const SkillCustomRow: React.FC<SkillCustomRowProps> = ({
                 <IconEdit className="w-4 h-4 text-gray-400" />
                 Chỉnh sửa
               </button>
-              <button 
+              <button
                 onClick={() => {
                   setIsDropdownOpen(false);
                   if (onDelete) onDelete(skill.id);
