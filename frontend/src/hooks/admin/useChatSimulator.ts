@@ -158,26 +158,45 @@ export const useChatSimulator = ({ botId, brandId }: UseChatSimulatorParams) => 
             : response;
 
         const responseBody = normalizedResponse.response as unknown;
-        const assistantText = Array.isArray(responseBody)
-          ? responseBody.join('\n').trim()
-          : typeof responseBody === 'string'
-            ? responseBody.trim()
-            : '';
+        const assistantParts = Array.isArray(responseBody)
+          ? responseBody
+              .map((item) => (typeof item === 'string' ? item.trim() : ''))
+              .filter(Boolean)
+          : typeof responseBody === 'string' && responseBody.trim()
+            ? [responseBody.trim()]
+            : [];
         const productImages = Array.isArray(normalizedResponse.product_images)
           ? normalizedResponse.product_images.filter(
               (item): item is string => typeof item === 'string' && item.trim().length > 0
             )
           : [];
 
-        const assistantMessage: ChatMessageItem = {
-          id: normalizedResponse.message_id || makeMessageId(),
-          role: 'assistant',
-          content: assistantText || 'Xin lỗi, hiện tại tôi chưa có phản hồi phù hợp.',
-          created_at: Date.now(),
-          product_images: productImages.length > 0 ? productImages : undefined,
-        };
+        const assistantMessages: ChatMessageItem[] =
+          assistantParts.length > 0
+            ? assistantParts.map((content, index) => ({
+                id:
+                  index === assistantParts.length - 1
+                    ? normalizedResponse.message_id || makeMessageId()
+                    : makeMessageId(),
+                role: 'assistant',
+                content,
+                created_at: Date.now(),
+                product_images:
+                  index === assistantParts.length - 1 && productImages.length > 0
+                    ? productImages
+                    : undefined,
+              }))
+            : [
+                {
+                  id: normalizedResponse.message_id || makeMessageId(),
+                  role: 'assistant',
+                  content: 'Xin lỗi, hiện tại tôi chưa có phản hồi phù hợp.',
+                  created_at: Date.now(),
+                  product_images: productImages.length > 0 ? productImages : undefined,
+                },
+              ];
 
-        setMessages((prev) => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, ...assistantMessages]);
         setLatestResponse(normalizedResponse);
       } catch (err) {
         const message = normalizeErrorMessage(err);
