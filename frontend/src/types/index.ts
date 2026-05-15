@@ -302,6 +302,7 @@ export interface ChatRequestPayload {
   user: ChatUserInfo;
   history?: Record<string, unknown>[] | null;
   message: string;
+  message_type?: 'text' | 'image' | null;
   bot_id: string;
   brand_id: string;
   payload?: Record<string, unknown> | null;
@@ -332,6 +333,7 @@ export interface ChatReasoning {
 export interface ChatResponsePayload {
   response: string[];
   reasoning?: ChatReasoning | null;
+  product_images?: string[] | null;
   message_id?: string | null;
   user_message_id?: string | null;
   [key: string]: unknown;
@@ -344,6 +346,8 @@ export interface ChatMessageItem {
   role: ChatMessageRole;
   content: string;
   created_at: number;
+  product_images?: string[];
+  user_image?: string;
 }
 
 // ─── FAQ ─────────────────────────────────────────────────────────────────────

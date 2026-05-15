@@ -517,6 +517,26 @@
   border-top-left-radius: 8px;
 }
 
+.sim-message-images {
+  width: min(100%, 420px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.sim-message-image {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e7ebf4;
+  background: #fff;
+}
+
+.sim-message-image--user {
+  width: min(240px, 100%);
+}
+
 .sim-feedback-btn {
   padding: 6px 12px;
   border-radius: 8px;
@@ -542,10 +562,81 @@
 
 .sim-chat-input-wrap {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
   border-top: 1px solid var(--color-border);
   padding: 12px;
+}
+
+.sim-image-dropzone {
+  border: 1px dashed #c9d2e5;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fafcff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-sub);
+  font-size: 12.5px;
+  transition: all var(--ease);
+}
+
+.sim-image-dropzone.is-dragging {
+  border-color: var(--color-primary);
+  background: #eef3ff;
+}
+
+.sim-image-file-input {
+  display: none;
+}
+
+.sim-image-upload-btn {
+  border: 1px solid #d6def0;
+  background: #fff;
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.sim-image-upload-btn:disabled {
+  opacity: 0.5;
+}
+
+.sim-pending-image {
+  position: relative;
+  width: fit-content;
+}
+
+.sim-image-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sim-image-error {
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+.sim-chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .sim-chat-input {

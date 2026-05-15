@@ -61,7 +61,7 @@ const readState = (storageKey: string): PersistedChatState => {
 const toHistoryPayload = (messages: ChatMessageItem[]) =>
   messages.map((m) => ({
     role: m.role,
-    content: m.content,
+    content: m.content || (m.user_image ? '[image]' : ''),
     created_at: m.created_at,
   }));
 
@@ -113,15 +113,18 @@ export const useChatSimulator = ({ botId, brandId }: UseChatSimulatorParams) => 
   }, [botId]);
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, imageUrl?: string) => {
       const content = text.trim();
-      if (!content || !botId || !brandId) return;
+      const normalizedImageUrl = typeof imageUrl === 'string' ? imageUrl.trim() : '';
+      if ((!content && !normalizedImageUrl) || !botId || !brandId) return;
+      const normalizedMessage = content || 'Ảnh người dùng gửi';
 
       const userMessage: ChatMessageItem = {
         id: makeMessageId(),
         role: 'user',
         content,
         created_at: Date.now(),
+        user_image: normalizedImageUrl || undefined,
       };
 
       const optimisticMessages = [...messages, userMessage];
@@ -136,11 +139,13 @@ export const useChatSimulator = ({ botId, brandId }: UseChatSimulatorParams) => 
             language: 'vi',
           },
           history: toHistoryPayload(optimisticMessages),
-          message: content,
+          message: normalizedMessage,
+          message_type: normalizedImageUrl ? 'image' : 'text',
           bot_id: botId,
           brand_id: brandId,
           payload: {
             source: 'chat_simulator',
+            ...(normalizedImageUrl && { image_url: normalizedImageUrl }),
           },
         });
 
@@ -158,13 +163,19 @@ export const useChatSimulator = ({ botId, brandId }: UseChatSimulatorParams) => 
           : typeof responseBody === 'string'
             ? responseBody.trim()
             : '';
+        const productImages = Array.isArray(normalizedResponse.product_images)
+          ? normalizedResponse.product_images.filter(
+              (item): item is string => typeof item === 'string' && item.trim().length > 0
+            )
+          : [];
 
         const assistantMessage: ChatMessageItem = {
-                  id: normalizedResponse.message_id || makeMessageId(),
-                  role: 'assistant',
-                  content: assistantText || 'Xin lỗi, hiện tại tôi chưa có phản hồi phù hợp.',
-                  created_at: Date.now(),
-                };
+          id: normalizedResponse.message_id || makeMessageId(),
+          role: 'assistant',
+          content: assistantText || 'Xin lỗi, hiện tại tôi chưa có phản hồi phù hợp.',
+          created_at: Date.now(),
+          product_images: productImages.length > 0 ? productImages : undefined,
+        };
 
         setMessages((prev) => [...prev, assistantMessage]);
         setLatestResponse(normalizedResponse);

@@ -112,6 +112,14 @@ const formatReasoningFlow = (value: string): string =>
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
+const readFileAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Không thể đọc ảnh đã chọn.'));
+    reader.readAsDataURL(file);
+  });
+
 const extractDebugData = (response: ChatResponsePayload | null): DebugData => {
   if (!response) return EMPTY_DEBUG;
 
@@ -281,13 +289,18 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
   } = useChatSimulator({ botId, brandId });
 
   const [input, setInput] = useState('');
+  const [pendingImageUrl, setPendingImageUrl] = useState('');
+  const [draggingImage, setDraggingImage] = useState(false);
+  const [imageInputError, setImageInputError] = useState('');
   const [collapsedDebug, setCollapsedDebug] = useState(false);
   const [showReasoningFlow, setShowReasoningFlow] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const messagesRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const debugData = useMemo(() => extractDebugData(latestResponse), [latestResponse]);
   const canChat = Boolean(botId && brandId);
+  const canSend = Boolean((input.trim() || pendingImageUrl) && canChat && !sending);
 
   useEffect(() => {
     if (!messagesRef.current) return;
@@ -296,15 +309,48 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || sending || !canChat) return;
+    if ((!input.trim() && !pendingImageUrl) || sending || !canChat) return;
     const messageToSend = input;
+    const imageToSend = pendingImageUrl;
     setInput('');
-    await sendMessage(messageToSend);
+    setPendingImageUrl('');
+    setImageInputError('');
+    await sendMessage(messageToSend, imageToSend || undefined);
   };
 
   const handleLoadSample = async () => {
     if (sending || !canChat) return;
     await sendMessage('alo');
+  };
+
+  const handlePickImage = async (file: File | null | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setImageInputError('Chỉ hỗ trợ file ảnh.');
+      return;
+    }
+
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      if (!dataUrl) throw new Error('Ảnh không hợp lệ.');
+      setPendingImageUrl(dataUrl);
+      setImageInputError('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Không thể xử lý ảnh đã chọn.';
+      setImageInputError(message);
+    }
+  };
+
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    await handlePickImage(e.target.files?.[0]);
+    e.target.value = '';
+  };
+
+  const handleDropImage = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDraggingImage(false);
+    await handlePickImage(e.dataTransfer.files?.[0]);
   };
 
   const handleClearConversation = async () => {
@@ -375,6 +421,19 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
                       <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
                         {message.content}
                       </div>
+                      {Array.isArray(message.product_images) && message.product_images.length > 0 && (
+                        <div className="sim-message-images">
+                          {message.product_images.map((url, index) => (
+                            <img
+                              key={`${message.id}-${url}-${index}`}
+                              src={url}
+                              alt={`product-${index + 1}`}
+                              className="sim-message-image"
+                              loading="lazy"
+                            />
+                          ))}
+                        </div>
+                      )}
                       {onSwitchToFeedback && (
                         <button
                           type="button"
@@ -387,8 +446,15 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
                       )}
                     </div>
                   ) : (
-                    <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
-                      {message.content}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', maxWidth: '82%' }}>
+                      {message.content && (
+                        <div className={`sim-message-bubble sim-message-bubble--${message.role}`}>
+                          {message.content}
+                        </div>
+                      )}
+                      {message.user_image && (
+                        <img src={message.user_image} alt="user-upload" className="sim-message-image sim-message-image--user" />
+                      )}
                     </div>
                   )}
                 </div>
@@ -396,16 +462,70 @@ const ChatSimulator: React.FC<ChatSimulatorProps> = ({ botId, botName, brandId, 
             </div>
 
             <form className="sim-chat-input-wrap" onSubmit={handleSubmit}>
-              <input
-                className="sim-chat-input"
-                placeholder="Nhập tin nhắn để kiểm thử AI..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={!canChat || sending}
-              />
-              <button type="submit" className="sim-chat-send" disabled={!input.trim() || !canChat || sending}>
-                <i className="ti-location-arrow"></i>
-              </button>
+              <div
+                className={`sim-image-dropzone ${draggingImage ? 'is-dragging' : ''}`}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  setDraggingImage(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDraggingImage(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  if (e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)) return;
+                  setDraggingImage(false);
+                }}
+                onDrop={handleDropImage}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="sim-image-file-input"
+                  onChange={handleFileInputChange}
+                  disabled={!canChat || sending}
+                />
+                <button
+                  type="button"
+                  className="sim-image-upload-btn"
+                  disabled={!canChat || sending}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <i className="ti-image"></i> Chọn ảnh
+                </button>
+                <span>Kéo thả ảnh vào đây để gửi URL ảnh cho chat</span>
+              </div>
+
+              {pendingImageUrl && (
+                <div className="sim-pending-image">
+                  <img src={pendingImageUrl} alt="pending-upload" className="sim-message-image sim-message-image--user" />
+                  <button
+                    type="button"
+                    className="sim-image-remove-btn"
+                    onClick={() => setPendingImageUrl('')}
+                    title="Gỡ ảnh"
+                  >
+                    <i className="ti-close"></i>
+                  </button>
+                </div>
+              )}
+
+              {imageInputError && <div className="sim-image-error">{imageInputError}</div>}
+
+              <div className="sim-chat-input-row">
+                <input
+                  className="sim-chat-input"
+                  placeholder="Nhập tin nhắn để kiểm thử AI..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={!canChat || sending}
+                />
+                <button type="submit" className="sim-chat-send" disabled={!canSend}>
+                  <i className="ti-location-arrow"></i>
+                </button>
+              </div>
             </form>
           </section>
 
