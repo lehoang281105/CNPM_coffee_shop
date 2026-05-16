@@ -252,12 +252,14 @@ const Intents: React.FC<IntentsProps> = ({ botId }) => {
           ) : (
             filteredRows.map(({ intent, meta, linkedGoalIds }) => {
               const expanded = expandedIntentIds.includes(intent.id);
-              const linkedGoals = linkedGoalIds.map((goalId) => ({
-                id: goalId,
-                name: goalNameMap.get(goalId) || goalId,
-              }));
+              const linkedGoals = linkedGoalIds
+                .filter((goalId) => goalNameMap.has(goalId))
+                .map((goalId) => ({
+                  id: goalId,
+                  name: goalNameMap.get(goalId) || goalId,
+                }));
 
-              const skills = meta.skills.length > 0 ? meta.skills : linkedGoalIds.slice(0, 3);
+              const skills = meta.skills;
 
               return (
                 <article className="intent-item-card" key={intent.id}>
@@ -335,10 +337,6 @@ const Intents: React.FC<IntentsProps> = ({ botId }) => {
                               <div className="intent-goal-text">
                                 <strong>{goal.name}</strong>
                                 <span>{goal.id}</span>
-                              </div>
-                              <div className="intent-goal-progress">
-                                <strong>95%</strong>
-                                <span>hoàn thành</span>
                               </div>
                             </div>
                           ))}
