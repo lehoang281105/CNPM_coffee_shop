@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import AgentLayout from '../../../layouts/admin/AgentLayout';
 import GeneralConfig from './tabs/Đào tạo/General/GeneralConfig';
 import ServiceTab from './tabs/Đào tạo/ServiceTab';
@@ -11,13 +11,20 @@ import Goals from './tabs/Đào tạo/Goal/Goals';
 import FAQ from './tabs/Đào tạo/FAQ/FAQ';
 import Feedback from './tabs/Kiểm thử/Feedback/Feedback';
 import ChatSimulator from './tabs/Kiểm thử/Chat simulator/ChatSimulator';
+import Products from './tabs/Đào tạo/Product/index';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'>('general');
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    const activeTab = (searchParams.get('tab') as any) || 'general';
+
+    const handleTabChange = (tabId: string) => {
+      setSearchParams({ tab: tabId });
+    };
 
   const {
     bot,
@@ -32,9 +39,9 @@ const AgentDetailPage: React.FC = () => {
 
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback' || menuId === 'skills' || menuId === 'services' || menuId === 'knowledge') {
-      setActiveTab(menuId as any);
-
+    const validTabs = ['general', 'intent', 'goals', 'branches', 'simulator', 'faq', 'feedback', 'skills', 'services', 'knowledge', 'products', 'visual-search'];
+    if (validTabs.includes(menuId)) {
+      handleTabChange(menuId);
     }
   };
 
@@ -45,7 +52,7 @@ const AgentDetailPage: React.FC = () => {
         brand={brand}
         loading={loading}
         activeTab={activeTab}
-        onTabChange={(tabId) => setActiveTab(tabId as any)}
+        onTabChange={handleTabChange}
         activeMenuId={activeTab}
         onMenuSelect={handleMenuSelect}
       >
@@ -67,6 +74,8 @@ const AgentDetailPage: React.FC = () => {
               <Feedback botId={bot.id} />
             ) : activeTab === 'services' ? (
               <ServiceTab botId={bot.id} brandId={bot.brand_id} />
+            ) : activeTab === 'products' ? (
+              <Products brandId={bot.brand_id || ''} botId={bot.id || id || ''} />
             ) : activeTab === 'general' ? (
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : activeTab === 'knowledge' ? (

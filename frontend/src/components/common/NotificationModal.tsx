@@ -3,7 +3,7 @@ import React from 'react';
 export interface NotificationModalProps {
   title: string;
   message: string;
-  type?: 'success' | 'error' | 'info';
+  type?: 'success' | 'error' | 'info'| 'warning';
   onClose: () => void;
 }
 

@@ -26,6 +26,7 @@ const MENU_GROUPS = [
       { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
       { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
       { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
+      { id: 'products', label: 'Sản phẩm', icon: 'ti-package' },
     ]
   },
   {

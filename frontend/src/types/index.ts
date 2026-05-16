@@ -412,3 +412,62 @@ export interface ResetSessionPayload {
   bot_id: string;
 
 }
+
+// ─── Product ──────────────────────────────────────────────────────────────────
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  product_image: string[]; // Theo API trong product.md
+  product_metadata?: {
+    price?: number;
+    is_active?: boolean;
+    category_id?: string;
+    [key: string]: any;
+  };
+  brand_id: string;
+  branch_ids?: string[];
+  bot_ids?: string[];
+  created_at?: number;
+  updated_at?: number;
+  
+  // UI Helper fields (mapped from metadata or top level if API supports)
+  price?: any; 
+  is_active?: boolean;
+  category_id?: string;
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  product_image: string[];
+  brand_id: string;
+  branch_ids?: string[];
+  bot_ids?: string[];
+  product_metadata?: {
+    price?: any;
+    is_active?: boolean;
+    category_id?: string;
+  };
+  // Các trường phẳng để dễ làm việc với Form
+  price?: any;
+  is_active?: boolean;
+  category_id?: string;
+}
+
+export interface ProductSearchTextRequest {
+  brand_id: string;
+  query: string;
+  branch_id?: string;
+  bot_id?: string;
+  top_k?: number;
+}
+
+export interface ProductSearchImageRequest {
+  brand_id: string;
+  image_url?: string;
+  file?: File | Blob;
+  branch_id?: string;
+  bot_id?: string;
+  top_k?: number;
+}
