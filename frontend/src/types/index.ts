@@ -378,8 +378,8 @@ export interface Feedback {
   original_question: string;
   original_answer: string;
   corrected_answer?: string | null;
-  rating: string; // "pending" | "positive" | "negative"
-  status: string; // "pending" | "saved_to_faq" | "reported_to_dev" | "dev_fixed" | "dismissed"
+  rating: string; // "pending" | "thumbs_up" | "thumbs_down"
+  status: string; // "pending" | "saved_to_faq" | "needs_dev_review" | "dev_fixed" | "dismissed"
   faq_id?: string | null;
   note?: string | null;
 }
@@ -429,6 +429,8 @@ export interface InboxMessageItem {
   sender_type: string; // 'user' | 'bot' | 'human' (or similar based on API)
   created_at: string;
   is_read: boolean;
+  feedback_id?: string;
+  rating?: string; // "thumbs_up" | "thumbs_down"
 }
 
 export interface UserProfileResponse {

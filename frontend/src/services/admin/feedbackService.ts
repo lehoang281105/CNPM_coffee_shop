@@ -1,7 +1,7 @@
 import axiosInstance from '../axiosInstance';
 import type { ApiResponse, Feedback, FeedbackCreatePayload, FeedbackRatingPayload, FeedbackSavePayload, FeedbackReportDevPayload } from '../../types';
 
-const BASE_URL = '/api/feedbacks';
+const BASE_URL = '/feedbacks';
 
 export const feedbackService = {
   // Lấy danh sách feedback theo bot_id

@@ -22,6 +22,8 @@ export default function Feedback({ botId }: FeedbackProps) {
     handleCreate: createFeedback,
     handleSaveToFAQ,
     handleReportToDev,
+    handleMarkFixed,
+    handleConfirmFix,
     handleDismiss,
     handleDelete,
   } = useFeedback({ botId });
@@ -56,7 +58,7 @@ export default function Feedback({ botId }: FeedbackProps) {
   const stats = useMemo(() => {
     const pending = allFeedbacks.filter(f => f.status === 'pending').length;
     const savedToFaq = allFeedbacks.filter(f => f.status === 'saved_to_faq').length;
-    const reportedToDev = allFeedbacks.filter(f => f.status === 'reported_to_dev').length;
+    const reportedToDev = allFeedbacks.filter(f => f.status === 'needs_dev_review').length;
     return { pending, savedToFaq, reportedToDev };
   }, [allFeedbacks]);
 
@@ -69,7 +71,7 @@ export default function Feedback({ botId }: FeedbackProps) {
     const statusMap: Record<string, { label: string; className: string }> = {
       pending: { label: 'Chờ xử lý', className: 'status-pending' },
       saved_to_faq: { label: 'Đã lưu FAQ', className: 'status-saved' },
-      reported_to_dev: { label: 'Báo Dev', className: 'status-reported' },
+      needs_dev_review: { label: 'Báo Dev', className: 'status-reported' },
       dev_fixed: { label: 'Dev đã fix', className: 'status-fixed' },
       dismissed: { label: 'Đã bỏ qua', className: 'status-dismissed' },
     };
@@ -78,8 +80,8 @@ export default function Feedback({ botId }: FeedbackProps) {
   };
 
   const getRatingIcon = (rating: string) => {
-    if (rating === 'positive') return <span style={{ color: '#10b981' }}>👍</span>;
-    if (rating === 'negative') return <span style={{ color: '#ef4444' }}>👎</span>;
+    if (rating === 'thumbs_up') return <span style={{ color: '#10b981' }}>👍</span>;
+    if (rating === 'thumbs_down') return <span style={{ color: '#ef4444' }}>👎</span>;
     return <span style={{ color: '#94a3b8' }}>—</span>;
   };
 
@@ -212,6 +214,34 @@ export default function Feedback({ botId }: FeedbackProps) {
         message: err instanceof Error ? err.message : 'Không thể bỏ qua feedback.',
         type: 'error',
       });
+    }
+  };
+
+  const handleMarkFixedClick = async (feedback: FeedbackType) => {
+    try {
+      await handleMarkFixed(feedback.id);
+      setNotification({
+        title: 'Đã Fix',
+        message: 'Đã đánh dấu feedback là đã xử lý.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('Error marking fixed:', err);
+      setNotification({ title: 'Thất bại', message: 'Không thể đánh dấu đã fix.', type: 'error' });
+    }
+  };
+
+  const handleConfirmFixClick = async (feedback: FeedbackType) => {
+    try {
+      await handleConfirmFix(feedback.id);
+      setNotification({
+        title: 'Xác nhận',
+        message: 'Đã xác nhận fix thành công.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('Error confirming fix:', err);
+      setNotification({ title: 'Thất bại', message: 'Không thể xác nhận fix.', type: 'error' });
     }
   };
 
@@ -418,6 +448,28 @@ export default function Feedback({ botId }: FeedbackProps) {
                         <i className="ti-close" />
                       </button>
                     </>
+                  )}
+                  {fb.status === 'needs_dev_review' && (
+                    // TODO: Role check - Chỉ hiện với Dev
+                    <button
+                      className="faq-action-btn"
+                      title="Đánh dấu đã Fix (Dev)"
+                      onClick={() => handleMarkFixedClick(fb)}
+                      style={{ color: '#059669' }}
+                    >
+                      <i className="ti-check-box" />
+                    </button>
+                  )}
+                  {fb.status === 'dev_fixed' && (
+                    // TODO: Role check - Chỉ hiện với Business
+                    <button
+                      className="faq-action-btn"
+                      title="Xác nhận Fix xong"
+                      onClick={() => handleConfirmFixClick(fb)}
+                      style={{ color: '#10b981' }}
+                    >
+                      <i className="ti-check" />
+                    </button>
                   )}
                   <button
                     className="faq-action-btn faq-action-btn--danger"
