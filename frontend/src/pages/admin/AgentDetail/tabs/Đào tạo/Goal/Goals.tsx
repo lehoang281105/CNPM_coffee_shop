@@ -6,7 +6,6 @@ import type {
   GoalCreatePayload,
   GoalUpdatePayload,
 } from '../../../../../../types';
-import { parseGoalRule } from '../../../../../../utils/goalHelpers';
 import { parseIntentMeta } from '../../../../../../utils/intentHelpers';
 import GoalModal from './GoalModal';
 
@@ -65,7 +64,6 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
     () =>
       goals.map((goal) => ({
         goal,
-        parsedRule: parseGoalRule(goal),
         intentInfo: goal.intent_id ? intentMap.get(goal.intent_id) : null,
       })),
     [goals, intentMap]
@@ -73,7 +71,7 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return goalRows.filter(({ goal, parsedRule, intentInfo }) => {
+    return goalRows.filter(({ goal, intentInfo }) => {
       if (intentFilter !== 'all' && goal.intent_id !== intentFilter) return false;
       if (!q) return true;
 
@@ -85,8 +83,6 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
         goal.rule ?? '',
         intentInfo?.machine ?? '',
         intentInfo?.display ?? '',
-        ...parsedRule.samples.flatMap((sample) => [sample.user, sample.assistant]),
-        ...parsedRule.skills,
       ]
         .join(' ')
         .toLowerCase();
@@ -301,10 +297,8 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
           ) : filteredRows.length === 0 ? (
             <div className="goals-empty">Chưa có mục tiêu phù hợp với bộ lọc hiện tại.</div>
           ) : (
-            filteredRows.map(({ goal, intentInfo, parsedRule }) => {
+            filteredRows.map(({ goal, intentInfo }) => {
               const expanded = expandedGoalIds.includes(goal.id);
-              const sampleCount = parsedRule.samples.length;
-              const skillCount = parsedRule.skills.length;
 
               return (
                 <article className={`goals-item-card ${expanded ? 'is-expanded' : ''}`} key={goal.id}>
@@ -327,8 +321,6 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
                           ) : (
                             <span>Chưa gắn intent</span>
                           )}
-                          <span>{sampleCount} Q&amp;A</span>
-                          <span>{skillCount} skills</span>
                           <span>{goal.id}</span>
                         </div>
                       </div>
@@ -384,45 +376,6 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
                           <p className="goals-template-text">{goal.rule}</p>
                         ) : (
                           <p className="goals-empty-sub">Chưa cấu hình rule cho goal này.</p>
-                        )}
-                      </div>
-
-                      <div className="goals-section skills">
-                        <p className="goals-section-title">
-                          <i className="ti-bolt-alt"></i> Skills được parse từ rule ({skillCount})
-                        </p>
-                        <div className="goals-chip-wrap">
-                          {parsedRule.skills.length > 0 ? (
-                            parsedRule.skills.map((skill) => (
-                              <span key={`${goal.id}-${skill}`} className="goals-chip green">
-                                {skill}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="goals-empty-sub">Chưa có skills.</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="goals-section answer">
-                        <p className="goals-section-title">
-                          <i className="ti-comment-alt"></i> Mẫu hội thoại ({sampleCount})
-                        </p>
-                        {sampleCount === 0 ? (
-                          <p className="goals-empty-sub">Chưa có mẫu hội thoại trong rule.</p>
-                        ) : (
-                          <div className="goals-sample-list">
-                            {parsedRule.samples.map((sample, idx) => (
-                              <div className="goals-sample-item" key={`${goal.id}-${idx}`}>
-                                <p>
-                                  <strong>KH:</strong> {sample.user}
-                                </p>
-                                <p>
-                                  <strong>AI:</strong> {sample.assistant}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
                         )}
                       </div>
 
