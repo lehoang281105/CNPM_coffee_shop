@@ -116,7 +116,7 @@ const Goals: React.FC<GoalsProps> = ({ botId }) => {
       if (prev.length > 0) {
         return prev.filter((goalId) => filteredRows.some((row) => row.goal.id === goalId));
       }
-      return [filteredRows[0].goal.id];
+      return [];
     });
   }, [filteredRows]);
 

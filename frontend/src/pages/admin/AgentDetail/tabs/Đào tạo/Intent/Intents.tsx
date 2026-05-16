@@ -68,7 +68,7 @@ const Intents: React.FC<IntentsProps> = ({ botId }) => {
 
     setExpandedIntentIds((prev) => {
       if (prev.length > 0) return prev.filter((id) => intentRows.some((row) => row.intent.id === id));
-      return [intentRows[0].intent.id];
+      return [];
     });
   }, [intentRows]);
 
