@@ -11,13 +11,23 @@ import Goals from './tabs/Đào tạo/Goal/Goals';
 import FAQ from './tabs/Đào tạo/FAQ/FAQ';
 import Feedback from './tabs/Kiểm thử/Feedback/Feedback';
 import ChatSimulator from './tabs/Kiểm thử/Chat simulator/ChatSimulator';
+import DeployOverview from './tabs/Triển khai/DeployOverview';
+import DeploymentChannels from './tabs/Triển khai/DeploymentChannels';
+import TargetAudience from './tabs/Triển khai/TargetAudience';
+import BehaviorControl from './tabs/Triển khai/BehaviorControl';
+import Forwarding from './tabs/Triển khai/Forwarding';
+import UiExperience from './tabs/Triển khai/UiExperience';
 import NotificationModal from '../../../components/common/NotificationModal';
 import { useAgentDetail } from '../../../hooks/admin/useAgentDetail';
 import './AgentDetail.css';
 
 const AgentDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [activeTab, setActiveTab] = useState<'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'>('general');
+    const [activeTab, setActiveTab] = useState<
+      | 'general' | 'intent' | 'goals' | 'knowledge' | 'branches' | 'simulator' | 'faq' | 'feedback' | 'skills' | 'services'
+      | 'deploy-overview' | 'channels' | 'audience' | 'behavior' | 'forwarding' | 'ui-ux'
+      | 'escalation' | 'scenario-testing' | 'test-history' | 'auto-qa' | 'manual-qa' | 'insights'
+    >('general');
 
   const {
     bot,
@@ -32,10 +42,7 @@ const AgentDetailPage: React.FC = () => {
 
 
   const handleMenuSelect = (menuId: string) => {
-    if (menuId === 'general' || menuId === 'intent' || menuId === 'goals' || menuId === 'branches' || menuId === 'simulator' || menuId === 'faq' || menuId === 'feedback' || menuId === 'skills' || menuId === 'services' || menuId === 'knowledge') {
-      setActiveTab(menuId as any);
-
-    }
+    setActiveTab(menuId as typeof activeTab);
   };
 
   return (
@@ -74,8 +81,24 @@ const AgentDetailPage: React.FC = () => {
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : activeTab === 'knowledge' ? (
               <KnowledgeTab bot={bot.id} />
-            ) : activeTab === 'simulator' ? null : (
+            ) : activeTab === 'deploy-overview' ? (
+              <DeployOverview />
+            ) : activeTab === 'channels' ? (
+              <DeploymentChannels />
+            ) : activeTab === 'audience' ? (
+              <TargetAudience />
+            ) : activeTab === 'behavior' ? (
+              <BehaviorControl />
+            ) : activeTab === 'forwarding' ? (
+              <Forwarding />
+            ) : activeTab === 'ui-ux' ? (
+              <UiExperience />
+            ) : activeTab === 'simulator' ? null : activeTab === 'branches' ? (
               <Branches brandId={bot.brand_id} />
+            ) : (
+              <div className="deploy-placeholder">
+                <p>Tính năng đang được phát triển.</p>
+              </div>
             )}
           </>
         ) : (

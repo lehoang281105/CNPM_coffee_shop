@@ -16,50 +16,88 @@ interface AgentLayoutProps {
 
 const MENU_GROUPS = [
   {
-    title: 'ĐÀO TẠO',
+    title: '',
     items: [
-      { id: 'general', label: 'Cấu hình chung', icon: 'ti-settings' },
-      { id: 'intent', label: 'Ý định', icon: 'ti-target' },
-      { id: 'goals', label: 'Mục tiêu', icon: 'ti-flag' },
-      { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
-      { id: 'skills', label: 'Kỹ năng', icon: 'ti-bolt' },
-      { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
-      { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
-      { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
-    ]
+      { id: 'escalation', label: 'Quy tắc leo thang', icon: 'ti-alert' },
+      { id: 'feedback', label: 'Phản hồi', icon: 'ti-comment-alt' },
+    ],
   },
   {
     title: 'KIỂM THỬ',
     items: [
       { id: 'simulator', label: 'Chat Simulator', icon: 'ti-headphone-alt' },
-      { id: 'feedback', label: 'Feedback', icon: 'ti-hand-point-up' },
-    ]
+      { id: 'scenario-testing', label: 'Scenario Testing', icon: 'ti-layout-list-thumb' },
+      { id: 'test-history', label: 'Lịch sử kiểm thử', icon: 'ti-time' },
+    ],
   },
   {
     title: 'TRIỂN KHAI',
     items: [
       { id: 'deploy-overview', label: 'Tổng quan', icon: 'ti-layout-grid2' },
       { id: 'channels', label: 'Kênh triển khai', icon: 'ti-world' },
-      { id: 'audience', label: 'Đối tượng áp dụng', icon: 'ti-id-badge' },
-      { id: 'behavior', label: 'Điều khiển hành vi', icon: 'ti-wand' },
+      { id: 'audience', label: 'Đối tượng áp dụng', icon: 'ti-user' },
+      { id: 'behavior', label: 'Điều khiển hành vi', icon: 'ti-bolt' },
       { id: 'forwarding', label: 'Chuyển tiếp', icon: 'ti-share-alt' },
       { id: 'ui-ux', label: 'Giao diện & Trải nghiệm', icon: 'ti-palette' },
-    ]
+    ],
+  },
+  {
+    title: 'QA & TỐI ƯU',
+    items: [
+      { id: 'auto-qa', label: 'Auto QA', icon: 'ti-shield' },
+      { id: 'manual-qa', label: 'Manual QA', icon: 'ti-comment' },
+      { id: 'insights', label: 'Insights', icon: 'ti-stats-up' },
+    ],
   },
 ];
+
+/** Menu cấu hình đào tạo (giữ tương thích tab hiện có) */
+export const TRAINING_MENU_GROUP = {
+  title: 'ĐÀO TẠO',
+  items: [
+    { id: 'general', label: 'Cấu hình chung', icon: 'ti-settings' },
+    { id: 'intent', label: 'Ý định', icon: 'ti-target' },
+    { id: 'goals', label: 'Mục tiêu', icon: 'ti-flag' },
+    { id: 'knowledge', label: 'Tri thức', icon: 'ti-book' },
+    { id: 'skills', label: 'Kỹ năng', icon: 'ti-bolt' },
+    { id: 'faq', label: 'FAQ', icon: 'ti-help-alt' },
+    { id: 'branches', label: 'Chi nhánh', icon: 'ti-map-alt' },
+    { id: 'services', label: 'Dịch vụ', icon: 'ti-briefcase' },
+  ],
+};
 
 function getInitials(name: string) {
   if (!name) return 'AI';
   return name.split(/[\s—–\-]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
 }
 
-const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading, activeTab = 'general', onTabChange }) => {
+const TRAINING_TAB_IDS = new Set(TRAINING_MENU_GROUP.items.map((i) => i.id));
+
+const DEPLOY_TAB_IDS = new Set([
+  'deploy-overview', 'channels', 'audience', 'behavior', 'forwarding', 'ui-ux',
+  'escalation', 'scenario-testing', 'test-history', 'auto-qa', 'manual-qa', 'insights',
+  'simulator', 'feedback',
+]);
+
+const AgentLayout: React.FC<AgentLayoutProps> = ({
+  children,
+  bot,
+  brand,
+  loading,
+  activeTab = 'general',
+  onTabChange,
+}) => {
   const navigate = useNavigate();
 
   const botName = bot?.name || 'Loading...';
   const brandName = brand?.name ? ` — ${brand.name}` : '';
   const displayName = `${botName}${brandName}`;
   const isActive = bot?.status === 'active';
+  const isDeployContext = DEPLOY_TAB_IDS.has(activeTab);
+  const showTrainingMenu = TRAINING_TAB_IDS.has(activeTab);
+  const navGroups = showTrainingMenu
+    ? [TRAINING_MENU_GROUP, ...MENU_GROUPS]
+    : MENU_GROUPS;
 
   return (
     <div className="agent-layout">
@@ -70,21 +108,27 @@ const AgentLayout: React.FC<AgentLayoutProps> = ({ children, bot, brand, loading
         </button>
 
         <div className="sidebar-brand">
-          <div className="agent-avatar" style={{ width: 32, height: 32, fontSize: 12 }}>
+          <div
+            className={`agent-avatar${isDeployContext ? ' agent-avatar--deploy' : ''}`}
+            style={{ width: 32, height: 32, fontSize: 12 }}
+          >
             {getInitials(botName)}
           </div>
           <div className="sidebar-brand-info">
             <strong title={displayName}>{displayName}</strong>
             {!loading && (
-              <span className={`badge ${isActive ? 'badge--active' : 'badge--inactive'}`} style={{ transform: 'scale(0.85)', transformOrigin: 'left' }}>
-                {isActive ? 'Hoạt động' : 'Tắt'}
+              <span
+                className={`badge ${isDeployContext ? 'badge--production' : isActive ? 'badge--active' : 'badge--inactive'}`}
+                style={{ transform: 'scale(0.85)', transformOrigin: 'left' }}
+              >
+                {isDeployContext ? 'Production' : isActive ? 'Hoạt động' : 'Tắt'}
               </span>
             )}
           </div>
         </div>
 
         <nav className="sidebar-nav">
-          {MENU_GROUPS.map((group, index) => (
+          {navGroups.map((group, index) => (
             <div key={group.title || index} className="sidebar-group">
               {group.title && <span className="sidebar-group-title">{group.title}</span>}
               {group.items.map(item => (
