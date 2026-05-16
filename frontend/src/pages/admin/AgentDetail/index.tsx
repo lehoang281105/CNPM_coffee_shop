@@ -53,9 +53,12 @@ const AgentDetailPage: React.FC = () => {
           <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu Agent...</div>
         ) : bot ? (
           <>
-            {activeTab === 'simulator' ? (
+            {/* ChatSimulator luôn mounted, chỉ ẩn bằng CSS để không mất response khi chuyển tab */}
+            <div style={{ display: activeTab === 'simulator' ? 'block' : 'none' }}>
               <ChatSimulator botId={bot.id} botName={bot.name} brandId={bot.brand_id} />
-            ) : activeTab === 'intent' ? (
+            </div>
+
+            {activeTab === 'intent' ? (
               <Intents botId={bot.id} />
             ) : activeTab === 'goals' ? (
               <Goals botId={bot.id} />
@@ -71,7 +74,7 @@ const AgentDetailPage: React.FC = () => {
               <GeneralConfig bot={bot} brand={brand} onSave={handleSaveConfig} />
             ) : activeTab === 'knowledge' ? (
               <KnowledgeTab bot={bot.id} />
-              ) : (
+            ) : activeTab === 'simulator' ? null : (
               <Branches brandId={bot.brand_id} />
             )}
           </>
